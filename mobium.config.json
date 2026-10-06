@@ -1,0 +1,6 @@
+{
+  "testDir": "tests",
+  "projects": [
+    {"name": "android", "device": "emulator-5554"}
+  ]
+}

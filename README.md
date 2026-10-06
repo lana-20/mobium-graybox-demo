@@ -5,6 +5,17 @@ with [Mobium](https://github.com/mobiumdev/mobium)'s gray box, on
 [MobiumApp](https://github.com/mobiumdev/mobium-app), on Android and iOS,
 virtual and real.
 
+| | |
+| --- | --- |
+| **[The deck](https://lana-20.github.io/mobium-graybox-demo/)** | *Ask the App*, the talk: 29 slides with each device's recordings (arrow keys move, S shows the speaker notes) |
+| **[Quick start](docs/QUICKSTART.md)** | install Mobium, put MobiumApp on an emulator, and watch the same tap land stale, then current |
+| **[Tutorial](docs/TUTORIAL.md)** | the race as a test that fails five in five and passes five in five with one key, from Python, at its edges, and in your own app |
+| **[Evidence](evidence/README.md)** | every run behind the deck: four devices, with recordings, traces, reports and transcripts |
+
+Every command and output in the quick start and the tutorial was run from
+scratch — Mobium installed with `go install`, MobiumApp and this repository
+freshly cloned — and is shown as it printed.
+
 Everything here runs. `scripts/demo.sh` drives one device through four acts
 and keeps the evidence of each: a screen recording, a trace, screenshots of
 what the app said, the test reports, and a transcript of every command with
