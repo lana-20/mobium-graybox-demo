@@ -1,0 +1,13 @@
+<section id="p3-lease" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Busy is a lease, not a promise</h2>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">While work is in flight the app restates it every half second, from a native timer. <b style="font-weight:600; color:#EDEAE3">Unrenewed for 1.5 s, it is stale</b>: the app crashed holding it, or was suspended.</p>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:36px 48px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#94A0AB">Crash during a refresh, then a tap &nbsp;·&nbsp; emulator</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">$ mobium tap 300 30</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">tapped (300, 30)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#E0A526">gray box: not waited — the app stopped saying it is busy 3s ago (it was busy with doomed)</p>
+  </div>
+  <p style="font-size:30px; font-weight:300; line-height:1.4; color:#94A0AB; width:1560px">Without the lease, that tap would have waited 10 s for a dead app, then failed.</p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The renewal runs on a native timer, not on the JavaScript thread, so an app that is busy in JavaScript still renews, and a dead or suspended process stops. The output is verbatim from the Pixel 7 emulator run's transcript: Crash during a refresh holds a busy lease named doomed and dies 300 ms in; the next tap, on the status bar, is not held up. On Android the app often says away on its way down, and then that is the reason given: the same answer, sooner.</aside>
+</section>

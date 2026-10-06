@@ -1,0 +1,13 @@
+<section id="p1-four-checks" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Every check passes on the wrong row</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3; border:1px solid #2A343E; border-radius:8px; padding:16px">
+    <tr style="background:#1C242D"><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">check</th><th style="width:56%; text-align:left; font-size:26px; color:#94A0AB">what it asks</th><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">Row B, mid-work</th></tr>
+    <tr><td style="color:#E0A526">visible</td><td>is it on the screen?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">stable</td><td>has it stopped moving?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr><td style="color:#E0A526">enabled</td><td>does it take input?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">receivesEvents</td><td>would a finger reach it?</td><td style="color:#4C8C6A">yes</td></tr>
+  </table>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">Auto-wait is right about the screen. The screen is wrong about the app. <b style="font-weight:600; color:#EDEAE3">No amount of looking harder fixes that.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>These are Mobium's actionability checks, the ones every action makes before it touches anything (docs/guides/autowait.md). A spinner would fail visible on the rows, and Mobium would wait it out: that is the control in the demo, Refresh with a spinner, current every time. The quiet refresh leaves nothing on screen to wait for.</aside>
+</section>

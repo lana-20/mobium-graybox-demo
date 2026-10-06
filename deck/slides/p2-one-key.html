@@ -1,0 +1,20 @@
+<section id="p2-one-key" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Turning it on is one key</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:36px 40px; display:flex; flex-direction:column; gap:8px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#94A0AB; letter-spacing:2px; text-transform:uppercase">test file</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;"app": "dev.mobium.mobiumapp",</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#4C8C6A">+ "grayBox": true,</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;"beforeEach": [ ... ]</p>
+    </div>
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:36px 40px; display:flex; flex-direction:column; gap:8px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#94A0AB; letter-spacing:2px; text-transform:uppercase">command line &nbsp;·&nbsp; Python</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">$ mobium launch <b style="color:#E0A526">--gray-box</b> \</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;&nbsp;&nbsp;dev.mobium.mobiumapp</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">device.launch(app, <b style="color:#E0A526">gray_box=True</b>)</p>
+    </div>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">The same in MCP and every client &mdash; JavaScript, Go, Java, .NET. <b style="font-weight:600; color:#141A21">The steps don't change, and no sleep is added.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>app_launch with gray_box: true over MCP; launch(app, { grayBox: true }) in JavaScript; LaunchWithGrayBox in Go and .NET; launchWithGrayBox in Java. In a mobium test file, "grayBox": true beside "app" makes the launch before every test turn it on. An app without the library launches normally and the result says it did not answer, so nothing is waited for by mistake.</aside>
+</section>

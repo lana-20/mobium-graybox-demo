@@ -1,0 +1,9 @@
+{
+  "failed": [
+    "android-emulator\u0000tests/flaky.test.json\u0000a row tapped after a quiet refresh is current (1)",
+    "android-emulator\u0000tests/flaky.test.json\u0000a row tapped after a quiet refresh is current (2)",
+    "android-emulator\u0000tests/flaky.test.json\u0000a row tapped after a quiet refresh is current (3)",
+    "android-emulator\u0000tests/flaky.test.json\u0000a row tapped after a quiet refresh is current (4)",
+    "android-emulator\u0000tests/flaky.test.json\u0000a row tapped after a quiet refresh is current (5)"
+  ]
+}

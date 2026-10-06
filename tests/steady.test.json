@@ -1,0 +1,54 @@
+{
+  "description": "The same test with one key added: grayBox. MobiumApp says when it is busy, and every step waits for it to be idle before finding its target.",
+  "app": "dev.mobium.mobiumapp",
+  "grayBox": true,
+  "beforeEach": [
+    {
+      "scroll_to": {
+        "target": "label=Busy Demo",
+        "direction": "down"
+      }
+    },
+    {
+      "tap": "label=Busy Demo"
+    }
+  ],
+  "tests": [
+    {
+      "name": "a row tapped after a quiet refresh is current (${run})",
+      "each": [
+        {
+          "run": 1
+        },
+        {
+          "run": 2
+        },
+        {
+          "run": 3
+        },
+        {
+          "run": 4
+        },
+        {
+          "run": 5
+        }
+      ],
+      "steps": [
+        {
+          "tap": "testid=busyQuiet"
+        },
+        {
+          "tap": "testid=busyRowB"
+        },
+        {
+          "wait_for": {
+            "target": "testid=busyOutcome",
+            "condition": "text",
+            "text": ": current",
+            "timeout_ms": 3000
+          }
+        }
+      ]
+    }
+  ]
+}

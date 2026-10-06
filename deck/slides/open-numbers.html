@@ -1,0 +1,12 @@
+<section id="open-numbers" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:56px">
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:44px 56px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">$ mobium tap testid=busyRowB &nbsp;&nbsp;# launched normally</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3">row B, generation 1: <b style="color:#C4452F">stale</b></p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">$ mobium tap testid=busyRowB &nbsp;&nbsp;# launched with --gray-box</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#E0A526">gray box: waited 955 ms for the app to go idle (busy: quiet)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#4C8C6A">row B, generation 2: <b>current</b></p>
+  </div>
+  <p style="font-size:44px; font-weight:300; line-height:1.35; color:#BDC6CE; width:1560px">Same screen. Same row. Same tap. On a real iPhone.<br><b style="font-weight:600; color:#EDEAE3">The second time, the test asked the app first.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Let both outcomes sit before you speak. The row decides, not the tool: Row B says which generation it belonged to and whether that was the latest, read back with mobium text. Both from the iPhone 15 Plus run of scripts/demo.sh, acts 1 and 2 (evidence/2026-10-05-iphone/transcript.md). Same steps both times: Refresh quietly, then tap Row B. Do not explain the gray box yet; that is the whole talk.</aside>
+</section>

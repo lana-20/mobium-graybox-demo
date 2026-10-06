@@ -1,0 +1,12 @@
+<section id="p2-reach" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">How the lines reach Mobium: nothing new listens</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3; border:1px solid #2A343E; border-radius:8px; padding:16px">
+    <tr style="background:#1C242D"><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">device</th><th style="width:52%; text-align:left; font-size:26px; color:#94A0AB">channel</th><th style="width:26%; text-align:left; font-size:26px; color:#94A0AB">measured</th></tr>
+    <tr><td style="color:#E0A526">iPhone</td><td>the log stream a session already holds</td><td style="color:#4C8C6A">1–4 ms</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">simulator</td><td>a log stream narrowed to the subsystem</td><td>live</td></tr>
+    <tr><td style="color:#E0A526">Android</td><td>logcat, from the device's clock at launch</td><td>live, gap-proof</td></tr>
+  </table>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">No server in the app, and <b style="font-weight:600; color:#EDEAE3">no port opened on anyone's phone.</b> The way out is the device log, which a test already reads.</p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>1 to 4 ms: on the iPhone 15 Plus, from the app writing a line to Mobium reading it over syslog_relay, with the phone's clock read through lockdown before and after the run to take out the offset (it was 37 to 38 ms ahead of the Mac). Android reads logcat from the device's own time at launch, so a line from an earlier launch is never read, and a restart picks up from the last line's time, so nothing in a gap is lost.</aside>
+</section>

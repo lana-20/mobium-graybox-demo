@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask the App: Gray-Box Mobile Testing with Mobium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap">
+<style>
+  html, body { margin:0; height:100%; background:#0B0E11; overflow:hidden; }
+  body { font-family: Rubik, Arial, sans-serif; }
+  #stage { position:fixed; inset:0; overflow:hidden; }
+  .slide { position:absolute; inset:0; visibility:hidden; }
+  .slide.is-active { visibility:visible; }
+  /* The slide format assumes a border-box canvas with no default margins:
+     padding sits INSIDE 1920x1080, and spacing comes from flex/grid gap only.
+     Without this reset a section lays out at 2176x1368 and spills off-screen. */
+  .slide > section, .slide > section * { box-sizing:border-box; margin:0; }
+  /* Centered by absolute positioning, not by grid: a 1920px item makes an auto
+     grid track 1920px wide, so place-items centers inside the TRACK and the
+     slide drifts off the viewport. translate(-50%,-50%) then scale is stable. */
+  .slide > section {
+    position:absolute; left:50%; top:50%; width:1920px; height:1080px; overflow:hidden;
+    transform-origin:center center; box-shadow:0 24px 80px rgba(0,0,0,.55);
+  }
+  .slide > section > aside { display:none; }
+  #bar {
+    position:fixed; left:0; right:0; bottom:0; height:3px; background:rgba(255,255,255,.08);
+  }
+  #bar > i { display:block; height:100%; background:#E0A526; width:0; transition:width .18s ease; }
+  #hud {
+    position:fixed; right:18px; bottom:16px; font-family:'Fira Code', ui-monospace, monospace;
+    font-size:13px; color:#7C8890; letter-spacing:1px; user-select:none;
+  }
+  #help {
+    position:fixed; left:18px; bottom:16px; font-family:'Fira Code', ui-monospace, monospace;
+    font-size:12px; color:#4A545B; letter-spacing:.5px; user-select:none;
+  }
+  #notes {
+    position:fixed; left:0; right:0; bottom:0; max-height:38vh; overflow:auto;
+    background:#12181E; color:#C7D0D8; border-top:1px solid #26313A;
+    padding:20px 26px 26px; font-size:16px; line-height:1.55; display:none;
+  }
+  #notes.on { display:block; }
+  #notes b { display:block; color:#E0A526; font-family:'Fira Code', ui-monospace, monospace;
+    font-size:12px; letter-spacing:1.5px; text-transform:uppercase; padding-bottom:6px; }
+  @media print {
+    html, body { background:#fff; overflow:visible; height:auto; }
+    #stage { position:static; display:block; }
+    #bar, #hud, #help, #notes { display:none !important; }
+    .slide { position:static; visibility:visible !important; page-break-after:always;
+              display:block; width:1920px; height:1080px; }
+    .slide > section { box-shadow:none; transform:none !important;
+                        position:relative; left:auto; top:auto; }
+    @page { size:1920px 1080px; margin:0; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+<div class="slide" data-id="cover"><section id="cover" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">Gray-box mobile testing &nbsp;·&nbsp; Mobium</p>
+  <h1 style="font-size:120px; font-weight:600; line-height:1.04; letter-spacing:-2px">Ask the App</h1>
+  <div style="width:180px; height:5px; background:#C4452F"></div>
+  <video src="deck/media/mobium-logo.mp4" poster="deck/media/mobium-logo.jpg" aria-label="The Mobium logo turns into a blue butterfly and back" style="position:absolute; right:128px; top:560px; width:360px; height:360px; object-fit:cover; border-radius:26px" autoplay muted loop playsinline></video>
+  <p style="font-size:38px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1150px">A screen can't tell you the work is done. The app can. How a test waits for the app's own word &mdash; measured on four devices: two real phones, a simulator and an emulator.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#94A0AB">Lana Begunova &nbsp;·&nbsp; SDET &mdash; AI | UI | API &nbsp;·&nbsp; Seattle</p>
+  <aside>Do not introduce yourself yet. Go straight to the two outputs on the next slide. The introduction comes after the cold open, in one line. The tile on the right is Mobium's logo turning into a butterfly and back; let it loop.</aside>
+</section></div>
+<div class="slide" data-id="open-numbers"><section id="open-numbers" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:56px">
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:44px 56px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">$ mobium tap testid=busyRowB &nbsp;&nbsp;# launched normally</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3">row B, generation 1: <b style="color:#C4452F">stale</b></p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">$ mobium tap testid=busyRowB &nbsp;&nbsp;# launched with --gray-box</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#E0A526">gray box: waited 955 ms for the app to go idle (busy: quiet)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#4C8C6A">row B, generation 2: <b>current</b></p>
+  </div>
+  <p style="font-size:44px; font-weight:300; line-height:1.35; color:#BDC6CE; width:1560px">Same screen. Same row. Same tap. On a real iPhone.<br><b style="font-weight:600; color:#EDEAE3">The second time, the test asked the app first.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Let both outcomes sit before you speak. The row decides, not the tool: Row B says which generation it belonged to and whether that was the latest, read back with mobium text. Both from the iPhone 15 Plus run of scripts/demo.sh, acts 1 and 2 (evidence/2026-10-05-iphone/transcript.md). Same steps both times: Refresh quietly, then tap Row B. Do not explain the gray box yet; that is the whole talk.</aside>
+</section></div>
+<div class="slide" data-id="premise"><section id="premise" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:48px">
+  <h2 style="font-size:84px; font-weight:600; line-height:1.08; letter-spacing:-1.5px; width:1600px">A screen can't say the work is done.</h2>
+  <p style="font-size:44px; font-weight:300; line-height:1.4; color:#5A6169; width:1560px">A test sees what a person sees. The app knows what it is doing. Two ways to decide when to tap:</p>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; background:#141A21; border-radius:16px; padding:44px; display:flex; flex-direction:column; gap:12px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:52px; font-weight:600; color:#E0A526">watch the screen</p>
+      <p style="font-size:32px; color:#BDC6CE; line-height:1.35">black box: on screen, still, enabled, uncovered</p>
+    </div>
+    <div style="flex:1; background:#C4452F; border-radius:16px; padding:44px; display:flex; flex-direction:column; gap:12px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:52px; font-weight:600; color:#FFF6F1">ask the app</p>
+      <p style="font-size:32px; color:#FFE3D8; line-height:1.35">gray box: busy, or idle and on screen</p>
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Black box is the right default and stays the default: it needs nothing from the app. Gray box is for the work a screen hides, and it needs the app to take part. This is the thesis; everything after is how, and how we know.</aside>
+</section></div>
+<div class="slide" data-id="part1"><section id="part1" data-transition="push" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:150px; font-weight:600; line-height:1; color:#2A343E">01</p>
+  <h2 style="font-size:84px; font-weight:600; line-height:1.1; letter-spacing:-1px">The race nobody can see</h2>
+  <div style="width:180px; height:5px; background:#E0A526"></div>
+  <p style="font-size:38px; font-weight:300; color:#BDC6CE; width:1400px">A screen that looks finished, a tap that is right by every check, and a row about to be replaced.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Section divider. Two seconds on screen. Do not read it aloud.</aside>
+</section></div>
+<div class="slide" data-id="p1-busy-demo"><section id="p1-busy-demo" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 128px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:64px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:32px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10; letter-spacing:2px; text-transform:uppercase">MobiumApp &nbsp;·&nbsp; Busy Demo</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">Work the screen does not show</h2>
+      <div style="display:flex; flex-direction:column; gap:18px">
+        <p style="font-size:34px; line-height:1.4"><b style="font-weight:600">Refresh quietly</b> starts 0.4 to 1.6 s of work and leaves the old rows up.</p>
+        <p style="font-size:34px; line-height:1.4">Then a new generation of rows replaces them.</p>
+        <p style="font-size:34px; line-height:1.4">Tap a row, and it says whether it was <b style="font-weight:600; color:#4C8C6A">current</b> or <b style="font-weight:600; color:#C4452F">stale</b>.</p>
+      </div>
+      <p style="font-size:28px; font-weight:300; line-height:1.4; color:#5A6169">The app reports its own outcome, so no tool can grade itself.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#5A6169; letter-spacing:2px; text-transform:uppercase">iPhone 15 Plus</p>
+      <img src="deck/media/iphone-normal.jpg" alt="The Busy Demo on an iPhone: row B, generation 1: stale, above the Refresh, Refresh quietly and edge-control buttons and three rows of generation 1" style="width:380px; height:824px; object-fit:contain; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:18px">
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>MobiumApp is Mobium's own app under test: every screen is a control for a failure, and the app says what happened rather than leaving the tool to infer it. The work's length is random on purpose: that is what makes a race flaky instead of reliably broken. The screenshot is the iPhone after a stale tap: the outcome line reads row B, generation 1: stale.</aside>
+</section></div>
+<div class="slide" data-id="p1-four-checks"><section id="p1-four-checks" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Every check passes on the wrong row</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3; border:1px solid #2A343E; border-radius:8px; padding:16px">
+    <tr style="background:#1C242D"><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">check</th><th style="width:56%; text-align:left; font-size:26px; color:#94A0AB">what it asks</th><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">Row B, mid-work</th></tr>
+    <tr><td style="color:#E0A526">visible</td><td>is it on the screen?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">stable</td><td>has it stopped moving?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr><td style="color:#E0A526">enabled</td><td>does it take input?</td><td style="color:#4C8C6A">yes</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">receivesEvents</td><td>would a finger reach it?</td><td style="color:#4C8C6A">yes</td></tr>
+  </table>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">Auto-wait is right about the screen. The screen is wrong about the app. <b style="font-weight:600; color:#EDEAE3">No amount of looking harder fixes that.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>These are Mobium's actionability checks, the ones every action makes before it touches anything (docs/guides/autowait.md). A spinner would fail visible on the rows, and Mobium would wait it out: that is the control in the demo, Refresh with a spinner, current every time. The quiet refresh leaves nothing on screen to wait for.</aside>
+</section></div>
+<div class="slide" data-id="p1-flaky"><section id="p1-flaky" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:44px">
+  <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">How often the tap lands too early</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:36px; display:flex; flex-direction:column; gap:8px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:72px; font-weight:600; color:#C4452F">10/10</p><p style="font-size:28px; color:#5A6169">Pixel 7 emulator</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:36px; display:flex; flex-direction:column; gap:8px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:72px; font-weight:600; color:#C4452F">9/10</p><p style="font-size:28px; color:#5A6169">iPhone 17 Pro simulator</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:36px; display:flex; flex-direction:column; gap:8px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:72px; font-weight:600; color:#C4452F">7/10</p><p style="font-size:28px; color:#5A6169">Pixel 8 Pro</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:36px; display:flex; flex-direction:column; gap:8px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:72px; font-weight:600; color:#C4452F">9/10</p><p style="font-size:28px; color:#5A6169">iPhone 15 Plus</p></div>
+  </div>
+  <p style="font-size:36px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">Stale taps after a quiet refresh, one command at a time. Not always, which is worse than always: <b style="font-weight:600; color:#141A21">a sleep makes it pass on a slow day and fail on a slower one.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Each number is the black-box row of docs/checks/graybox.sh on that device, the last run before this deck: ten taps right after a quiet refresh, launched the ordinary way, each graded by the app. Over fifty more on the iPhone earlier in the day, 35 of 50 were stale. The rate depends on how fast the tool is against how long the work takes, which is exactly why a timeout tuned on one machine fails on another.</aside>
+</section></div>
+<div class="slide" data-id="part2"><section id="part2" data-transition="push" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:150px; font-weight:600; line-height:1; color:#2A343E">02</p>
+  <h2 style="font-size:84px; font-weight:600; line-height:1.1; letter-spacing:-1px">Ask the app</h2>
+  <div style="width:180px; height:5px; background:#E0A526"></div>
+  <p style="font-size:38px; font-weight:300; color:#BDC6CE; width:1400px">The app says when it is busy. Mobium listens on channels it already holds. One flag turns it on.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Section divider. Two seconds on screen. Do not read it aloud.</aside>
+</section></div>
+<div class="slide" data-id="p2-say-it"><section id="p2-say-it" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Two calls in the app: busy, and idle once it shows</h2>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:36px 48px; display:flex; flex-direction:column; gap:6px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">const refresh = () =&gt; {</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;GrayBox.<b style="color:#E0A526">busy</b>('quiet');</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">&nbsp;&nbsp;// ... the work; when it is done, the new rows ...</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">};</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">&nbsp;</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">useEffect(() =&gt; {</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;GrayBox.<b style="color:#E0A526">idle</b>('quiet'); &nbsp;<span style="color:#94A0AB">// after the new rows render</span></p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">}, [generation]);</p>
+  </div>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">Idle means <b style="font-weight:600; color:#EDEAE3">done and on screen</b>, not "the response arrived". Only the app can say that, so the app decides what counts as work.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Simplified from MobiumApp's Busy Demo (App.tsx): the real code counts pending work and calls idle in an effect that runs after the commit. GrayBox is Mobium's gray-box library, a local Expo module in MobiumApp, modules/graybox: about ninety lines of Swift and seventy of Kotlin. A native app writes the same lines itself.</aside>
+</section></div>
+<div class="slide" data-id="p2-lines"><section id="p2-lines" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">What the app writes to the device log</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#141A21; border:1px solid #D8D3C7; border-radius:8px; padding:14px">
+    <tr style="background:#E6E1D6"><th style="width:44%; text-align:left; font-size:24px; color:#5A6169">line</th><th style="width:56%; text-align:left; font-size:24px; color:#5A6169">meaning</th></tr>
+    <tr><td>MOBIUM-GRAYBOX on</td><td>the library is listening</td></tr>
+    <tr style="background:#F6F3EC"><td style="color:#9A6A10">MOBIUM-GRAYBOX busy=1 tag=quiet</td><td>work started; one thing in flight</td></tr>
+    <tr><td style="color:#9A6A10">MOBIUM-GRAYBOX still busy=1</td><td>every half second while it is</td></tr>
+    <tr style="background:#F6F3EC"><td style="color:#4C8C6A">MOBIUM-GRAYBOX busy=0 tag=quiet</td><td>finished, and on screen</td></tr>
+    <tr><td>MOBIUM-GRAYBOX lift</td><td>a finger came up</td></tr>
+    <tr style="background:#F6F3EC"><td>MOBIUM-GRAYBOX away / back</td><td>the app left the foreground / returned</td></tr>
+  </table>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">Silent unless the app was launched with the gray box on: <b style="font-weight:600; color:#141A21">-MobiumGrayBox YES</b> on iOS, the intent extra <b style="font-weight:600; color:#141A21">MobiumGrayBox=true</b> on Android. A person running the same build never turns it on.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The whole contract is these lines: an os_log subsystem, dev.mobium.graybox, on iOS, at the notice level with values public; logcat, tag MobiumGrayBox, on Android. iOS keeps a launch argument for that launch only; a launch from the home screen carries no intent extra. So the build you test is the build you could hand anyone, and nothing in it talks unless the test asked.</aside>
+</section></div>
+<div class="slide" data-id="p2-reach"><section id="p2-reach" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">How the lines reach Mobium: nothing new listens</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3; border:1px solid #2A343E; border-radius:8px; padding:16px">
+    <tr style="background:#1C242D"><th style="width:22%; text-align:left; font-size:26px; color:#94A0AB">device</th><th style="width:52%; text-align:left; font-size:26px; color:#94A0AB">channel</th><th style="width:26%; text-align:left; font-size:26px; color:#94A0AB">measured</th></tr>
+    <tr><td style="color:#E0A526">iPhone</td><td>the log stream a session already holds</td><td style="color:#4C8C6A">1–4 ms</td></tr>
+    <tr style="background:#1A222A"><td style="color:#E0A526">simulator</td><td>a log stream narrowed to the subsystem</td><td>live</td></tr>
+    <tr><td style="color:#E0A526">Android</td><td>logcat, from the device's clock at launch</td><td>live, gap-proof</td></tr>
+  </table>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">No server in the app, and <b style="font-weight:600; color:#EDEAE3">no port opened on anyone's phone.</b> The way out is the device log, which a test already reads.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>1 to 4 ms: on the iPhone 15 Plus, from the app writing a line to Mobium reading it over syslog_relay, with the phone's clock read through lockdown before and after the run to take out the offset (it was 37 to 38 ms ahead of the Mac). Android reads logcat from the device's own time at launch, so a line from an earlier launch is never read, and a restart picks up from the last line's time, so nothing in a gap is lost.</aside>
+</section></div>
+<div class="slide" data-id="p2-one-key"><section id="p2-one-key" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Turning it on is one key</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:36px 40px; display:flex; flex-direction:column; gap:8px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#94A0AB; letter-spacing:2px; text-transform:uppercase">test file</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;"app": "dev.mobium.mobiumapp",</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#4C8C6A">+ "grayBox": true,</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;"beforeEach": [ ... ]</p>
+    </div>
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:36px 40px; display:flex; flex-direction:column; gap:8px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#94A0AB; letter-spacing:2px; text-transform:uppercase">command line &nbsp;·&nbsp; Python</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">$ mobium launch <b style="color:#E0A526">--gray-box</b> \</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;&nbsp;&nbsp;dev.mobium.mobiumapp</p>
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">device.launch(app, <b style="color:#E0A526">gray_box=True</b>)</p>
+    </div>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">The same in MCP and every client &mdash; JavaScript, Go, Java, .NET. <b style="font-weight:600; color:#141A21">The steps don't change, and no sleep is added.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>app_launch with gray_box: true over MCP; launch(app, { grayBox: true }) in JavaScript; LaunchWithGrayBox in Go and .NET; launchWithGrayBox in Java. In a mobium test file, "grayBox": true beside "app" makes the launch before every test turn it on. An app without the library launches normally and the result says it did not answer, so nothing is waited for by mistake.</aside>
+</section></div>
+<div class="slide" data-id="part3"><section id="part3" data-transition="push" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:150px; font-weight:600; line-height:1; color:#2A343E">03</p>
+  <h2 style="font-size:84px; font-weight:600; line-height:1.1; letter-spacing:-1px">A door that closes</h2>
+  <div style="width:180px; height:5px; background:#E0A526"></div>
+  <p style="font-size:38px; font-weight:300; color:#BDC6CE; width:1400px">What a wait does, and what happens when the app can't answer: crashed, backgrounded, never finished, or not heard.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Section divider. Two seconds on screen. Do not read it aloud.</aside>
+</section></div>
+<div class="slide" data-id="p3-wait"><section id="p3-wait" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Before every touch, three things in order</h2>
+  <div style="display:flex; gap:24px; align-items:stretch">
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">1 &nbsp;the lift</p><p style="font-size:30px; line-height:1.35">the last tap's finger-up has been heard</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">2 &nbsp;150 ms of grace</p><p style="font-size:30px; line-height:1.35">for work that tap starts to be announced</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">3 &nbsp;busy=0</p><p style="font-size:30px; line-height:1.35">nothing in flight, then find the target</p></div>
+  </div>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:30px 36px; display:flex; flex-direction:column; gap:6px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:56px; font-weight:600; color:#E0A526">0–15 ms</p><p style="font-size:28px; color:#BDC6CE">from the lift to the app's busy line, 200 trials</p></div>
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:30px 36px; display:flex; flex-direction:column; gap:6px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:56px; font-weight:600; color:#E0A526">~35 ms</p><p style="font-size:28px; color:#BDC6CE">what a wait costs when the app is idle</p></div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The wait runs before the target is resolved, not just before the touch, so the target is found on the screen the work produced. The grace is ten times the worst gap measured: in 200 trials on the iPhone the app's busy line came 0 to 15 ms after the lift. With no lift heard during an action, as when the button is in an alert's own window, the grace counts from the action's end instead.</aside>
+</section></div>
+<div class="slide" data-id="p3-lease"><section id="p3-lease" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Busy is a lease, not a promise</h2>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">While work is in flight the app restates it every half second, from a native timer. <b style="font-weight:600; color:#EDEAE3">Unrenewed for 1.5 s, it is stale</b>: the app crashed holding it, or was suspended.</p>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:36px 48px; display:flex; flex-direction:column; gap:12px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#94A0AB">Crash during a refresh, then a tap &nbsp;·&nbsp; emulator</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">$ mobium tap 300 30</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">tapped (300, 30)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#E0A526">gray box: not waited — the app stopped saying it is busy 3s ago (it was busy with doomed)</p>
+  </div>
+  <p style="font-size:30px; font-weight:300; line-height:1.4; color:#94A0AB; width:1560px">Without the lease, that tap would have waited 10 s for a dead app, then failed.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The renewal runs on a native timer, not on the JavaScript thread, so an app that is busy in JavaScript still renews, and a dead or suspended process stops. The output is verbatim from the Pixel 7 emulator run's transcript: Crash during a refresh holds a busy lease named doomed and dies 300 ms in; the next tap, on the status bar, is not held up. On Android the app often says away on its way down, and then that is the reason given: the same answer, sooner.</aside>
+</section></div>
+<div class="slide" data-id="p3-edges"><section id="p3-edges" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:32px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Six edges, each with a button in the app</h2>
+  <table style="width:1664px; font-family:Rubik, Arial, sans-serif; font-size:28px; color:#141A21; border:1px solid #D8D3C7; border-radius:8px; padding:14px">
+    <tr style="background:#E6E1D6"><th style="width:30%; text-align:left; font-size:24px; color:#5A6169">edge</th><th style="width:48%; text-align:left; font-size:24px; color:#5A6169">what Mobium does</th><th style="width:22%; text-align:left; font-size:24px; color:#5A6169">shown on</th></tr>
+    <tr><td>work that never ends</td><td>refused after 10 s, naming it</td><td>all four</td></tr>
+    <tr style="background:#F6F3EC"><td>refresh from an alert</td><td>grace from the action's end; current</td><td>all four</td></tr>
+    <tr><td>two refreshes at once</td><td>both waited out</td><td>all four</td></tr>
+    <tr style="background:#F6F3EC"><td>Home, mid-work</td><td>not waited on: in the background</td><td>virtual devices</td></tr>
+    <tr><td>a crash, mid-work</td><td>not waited on: the lease ran out</td><td>virtual devices</td></tr>
+    <tr style="background:#F6F3EC"><td>the log stream killed</td><td>says so, then hears again</td><td>virtual devices</td></tr>
+  </table>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Each row is a row of docs/checks/graybox-edges.sh in Mobium, driven by a button on MobiumApp's Busy Demo: Refresh from an alert, Refresh twice, Keep polling, Crash during a refresh. The last three leave the app, so they run on the emulator and the simulator only: on a phone, the screen outside the app is somebody's. All four devices pass every row they run.</aside>
+</section></div>
+<div class="slide" data-id="p3-honest"><section id="p3-honest" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Every result says what it waited for</h2>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:32px 44px; display:flex; flex-direction:column; gap:10px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#E0A526">gray box: waited 955 ms for the app to go idle (busy: quiet)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">gray box: the app was idle</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#BDC6CE">gray box: not waited — the app said it is in the background</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#BDC6CE">gray box: not waited — not hearing the app: logcat stopped</p>
+  </div>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:32px 44px; display:flex; flex-direction:column; gap:10px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#C4452F">error: testid=busyRowA failed check idle: the app says it is still busy after 10s, with poll — something in the app never finishes; to act on the screen as it is, launch the app again without gray_box</p>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">A check a result does not mention reads as one that ran. <b style="font-weight:600; color:#EDEAE3">So none is silent, and every refusal names a remedy that works.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Every line here is verbatim from a run: the 955 ms wait and the polling refusal from the iPhone; the background and logcat lines from the emulator's edge checks. In JSON the waits are in app_idle. The refusal is a timeout that failed check idle, the sixth check after the five auto-wait makes, and its remedy, launching again without the gray box, is one that works.</aside>
+</section></div>
+<div class="slide" data-id="part4"><section id="part4" data-transition="push" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:150px; font-weight:600; line-height:1; color:#2A343E">04</p>
+  <h2 style="font-size:84px; font-weight:600; line-height:1.1; letter-spacing:-1px">Proving it</h2>
+  <div style="width:180px; height:5px; background:#E0A526"></div>
+  <p style="font-size:38px; font-weight:300; color:#BDC6CE; width:1400px">A fix has nothing to prove until the problem has shown up in the same run. And the recorder can change what it records.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Section divider. Two seconds on screen. Do not read it aloud.</aside>
+</section></div>
+<div class="slide" data-id="p4-control"><section id="p4-control" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Black box has to fail first, in the same run</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#141A21; border:1px solid #D8D3C7; border-radius:8px; padding:14px">
+    <tr style="background:#E6E1D6"><th style="width:40%; text-align:left; font-size:24px; color:#5A6169">device</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">normal: stale</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">spinner: stale</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">gray box: stale</th></tr>
+    <tr><td>Pixel 7 emulator</td><td style="color:#C4452F">10 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr style="background:#F6F3EC"><td>iPhone 17 Pro simulator</td><td style="color:#C4452F">9 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr><td>Pixel 8 Pro</td><td style="color:#C4452F">7 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr style="background:#F6F3EC"><td>iPhone 15 Plus</td><td style="color:#C4452F">9 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+  </table>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">The check fails if the normal launch never taps a stale row. <b style="font-weight:600; color:#141A21">A zero is not a result until the same setup has shown it can come back non-zero.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>docs/checks/graybox.sh in Mobium, the last run on each device. Three columns because three questions: does the race happen (normal), does auto-wait already handle what it can see (the spinner, the control: never stale), and does the gray box close the gap. Each row is graded by the app's own outcome line, never by what the tool reported.</aside>
+</section></div>
+<div class="slide" data-id="p4-watching"><section id="p4-watching" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Watching changed the timing</h2>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">The first Pixel recording showed no race at all. A full trace screenshots and reads the screen after every call, and every call waits for it.</p>
+  <div style="display:flex; flex-direction:column; gap:22px; width:1400px">
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">no trace</p><div style="width:281px; height:44px; background:#4C8C6A; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">1.4 s</p></div>
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">full trace</p><div style="width:1024px; height:44px; background:#C4452F; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">5.1 s</p></div>
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">trace, no screens</p><div style="width:261px; height:44px; background:#4C8C6A; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">1.3 s</p></div>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">With the work lasting at most 1.6 s, five seconds per two taps let it finish first, every time. <b style="font-weight:600; color:#EDEAE3">The demo records the screen as video and traces calls without screens.</b></p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Two taps, Refresh quietly then Row B, timed on the Pixel 8 Pro: 1.59 and 1.35 s untraced, 5.12 and 5.42 s with a full trace, 1.35 and 1.30 s with trace --no-screenshots --no-maps. The bars are drawn to that scale, at 200 px a second. The first Pixel run, with full traces, landed current five times in five. Mobium's trace help now says so. The general lesson: any instrument that adds time to each step can make a race disappear.</aside>
+</section></div>
+<div class="slide" data-id="demo"><section id="demo" data-transition="push" style="background:#C4452F; color:#FFF6F1; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:150px; font-weight:600; line-height:1; color:#E06A52">05</p>
+  <h2 style="font-size:84px; font-weight:600; line-height:1.1; letter-spacing:-1px">Demo: four devices</h2>
+  <div style="width:180px; height:5px; background:#FFF6F1"></div>
+  <p style="font-size:38px; font-weight:300; color:#FFE3D8; width:1400px">An emulator, a simulator, a Pixel and an iPhone. The same app, the same script, the same two taps.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Statement divider. The recordings are what scripts/demo.sh captured on each device on 5 October 2026; if a live run is possible, run act 1 and act 2 on the emulator and show the recordings for the rest.</aside>
+</section></div>
+<div class="slide" data-id="demo-run"><section id="demo-run" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">One script, four acts, the evidence kept</h2>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:32px 44px; display:flex; flex-direction:column; gap:8px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3">$ scripts/demo.sh emulator-5554 &nbsp;&nbsp;<span style="color:#94A0AB"># or a simulator, or a phone</span></p>
+  </div>
+  <table style="width:1664px; font-family:Rubik, Arial, sans-serif; font-size:30px; color:#EDEAE3; border:1px solid #2A343E; border-radius:8px; padding:16px">
+    <tr style="background:#1C242D"><th style="width:10%; text-align:left; font-size:26px; color:#94A0AB">act</th><th style="width:90%; text-align:left; font-size:26px; color:#94A0AB">what it does</th></tr>
+    <tr><td style="font-family:'Fira Code', 'Courier New', monospace; color:#E0A526">1</td><td>launched normally: Refresh quietly, then Row B</td></tr>
+    <tr style="background:#1A222A"><td style="font-family:'Fira Code', 'Courier New', monospace; color:#E0A526">2</td><td>the same two taps, launched with --gray-box</td></tr>
+    <tr><td style="font-family:'Fira Code', 'Courier New', monospace; color:#E0A526">3</td><td>the same as a test, five times each way: flaky and steady</td></tr>
+    <tr style="background:#1A222A"><td style="font-family:'Fira Code', 'Courier New', monospace; color:#E0A526">4</td><td>work that never ends; on virtual devices, a crash mid-work</td></tr>
+  </table>
+  <p style="font-size:30px; font-weight:300; line-height:1.4; color:#94A0AB; width:1560px">Each act keeps a screen recording, a trace, screenshots, the test reports and a transcript of every command with what it printed.</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The script and every run's evidence are in the demo repository; evidence/README.md is generated from each run's summary, so no number in it is typed by hand. A run ends by taking this machine's paths out of its evidence. On a real phone everything recorded is the app's own screen; the crash, which leaves the app, runs only on a virtual device.</aside>
+</section></div>
+<div class="slide" data-id="demo-emulator"><section id="demo-emulator" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 96px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:30px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">Android 15</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">Pixel 7 emulator</h2>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">normal &nbsp;&nbsp;&nbsp;Row B <b style="color:#C4452F">stale</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">gray box &nbsp;waited 1148 ms → <b style="color:#4C8C6A">current</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">suites &nbsp;&nbsp;&nbsp;0 of 5 → <b style="color:#4C8C6A">5 of 5</b></p>
+      </div>
+      <p style="font-size:28px; font-weight:300; line-height:1.4; color:#94A0AB">Graded by the app: each row says its own generation.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">normal</p>
+      <video src="deck/media/emulator-normal.mp4" poster="deck/media/emulator-normal.jpg" aria-label="Pixel 7 emulator, launched normally: row B, generation 1: stale" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">gray box</p>
+      <video src="deck/media/emulator-graybox.mp4" poster="deck/media/emulator-graybox.jpg" aria-label="Pixel 7 emulator, launched with the gray box: row B, generation 2: current" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Acts 1 and 2 of scripts/demo.sh on the Pixel 7 emulator, Android 15 (evidence/2026-10-05-android-emulator). Left: launched normally, Row B tapped while generation 1 was still up. Right: launched with the gray box; the tap waited 1148 ms for the app to say it was done, and landed on generation 2. Act 3: flaky.test.json 0 passed, 5 failed; steady.test.json 5 passed.</aside>
+</section></div>
+<div class="slide" data-id="demo-simulator"><section id="demo-simulator" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 96px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:30px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">iOS 26.5</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">iPhone 17 Pro simulator</h2>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">normal &nbsp;&nbsp;&nbsp;Row B <b style="color:#C4452F">stale</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">gray box &nbsp;waited 1202 ms → <b style="color:#4C8C6A">current</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">suites &nbsp;&nbsp;&nbsp;0 of 5 → <b style="color:#4C8C6A">5 of 5</b></p>
+      </div>
+      <p style="font-size:28px; font-weight:300; line-height:1.4; color:#94A0AB">Graded by the app: each row says its own generation.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">normal</p>
+      <video src="deck/media/simulator-normal.mp4" poster="deck/media/simulator-normal.jpg" aria-label="iPhone 17 Pro simulator, launched normally: row B, generation 1: stale" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">gray box</p>
+      <video src="deck/media/simulator-graybox.mp4" poster="deck/media/simulator-graybox.jpg" aria-label="iPhone 17 Pro simulator, launched with the gray box: row B, generation 2: current" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Acts 1 and 2 on the iPhone 17 Pro simulator, iOS 26.5 (evidence/2026-10-05-ios-simulator). The tap waited 1202 ms. On a simulator Mobium hears the app through a log stream narrowed to the library's subsystem. Act 3: flaky 0 passed, 5 failed; steady 5 passed.</aside>
+</section></div>
+<div class="slide" data-id="demo-pixel"><section id="demo-pixel" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 96px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:30px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">Android 17</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">Real Pixel 8 Pro</h2>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">normal &nbsp;&nbsp;&nbsp;Row B <b style="color:#C4452F">stale</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">gray box &nbsp;waited 709 ms → <b style="color:#4C8C6A">current</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">suites &nbsp;&nbsp;&nbsp;3 of 5 → <b style="color:#4C8C6A">5 of 5</b></p>
+      </div>
+      <p style="font-size:28px; font-weight:300; line-height:1.4; color:#94A0AB">Three of five passing is what flaky looks like: it depends on how long the work took.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">normal</p>
+      <video src="deck/media/pixel-normal.mp4" poster="deck/media/pixel-normal.jpg" aria-label="Real Pixel 8 Pro, launched normally: row B, generation 1: stale" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">gray box</p>
+      <video src="deck/media/pixel-graybox.mp4" poster="deck/media/pixel-graybox.jpg" aria-label="Real Pixel 8 Pro, launched with the gray box: row B, generation 2: current" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Acts 1 and 2 on a real Pixel 8 Pro, Android 17 (evidence/2026-10-05-android-phone). Everything recorded is the app's own screen. The tap waited 709 ms. The flaky suite passed 3 of 5 here, the honest middle of the range; the steady one passed 5 of 5. This is the device where a full trace hid the race; these recordings are from the rerun with screen-free traces.</aside>
+</section></div>
+<div class="slide" data-id="demo-iphone"><section id="demo-iphone" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 96px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:30px">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">iOS 26.6.2</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">Real iPhone 15 Plus</h2>
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">normal &nbsp;&nbsp;&nbsp;Row B <b style="color:#C4452F">stale</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">gray box &nbsp;waited 955 ms → <b style="color:#4C8C6A">current</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#BDC6CE">suites &nbsp;&nbsp;&nbsp;0 of 5 → <b style="color:#4C8C6A">5 of 5</b></p>
+      </div>
+      <p style="font-size:28px; font-weight:300; line-height:1.4; color:#94A0AB">Heard over the phone's own log, 1 to 4 ms after the app wrote each line.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">normal</p>
+      <video src="deck/media/iphone-normal.mp4" poster="deck/media/iphone-normal.jpg" aria-label="Real iPhone 15 Plus, launched normally: row B, generation 1: stale" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">gray box</p>
+      <video src="deck/media/iphone-graybox.mp4" poster="deck/media/iphone-graybox.jpg" aria-label="Real iPhone 15 Plus, launched with the gray box: row B, generation 2: current" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px" autoplay muted loop playsinline></video>
+    </div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Acts 1 and 2 on a real iPhone 15 Plus, iOS 26.6.2 (evidence/2026-10-05-iphone), the same run as the cold open. The recording is WebDriverAgent's screen stream, about ten frames a second at full size. The tap waited 955 ms. Act 3: flaky 0 passed, 5 failed; steady 5 passed. Act 4: the never-ending work was refused after 10.0 s, naming poll.</aside>
+</section></div>
+<div class="slide" data-id="demo-results"><section id="demo-results" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <h2 style="font-size:66px; font-weight:600; line-height:1.1; letter-spacing:-1px; width:1600px">What you just watched</h2>
+  <div style="display:flex; flex-direction:column; gap:18px">
+    <div style="background:#FAF8F3; border:1px solid #D8D3C7; border-radius:12px; padding:28px 36px"><p style="font-size:34px; line-height:1.4"><b style="font-weight:600">Every device, launched normally:</b> the first tap after a quiet refresh landed on a stale row.</p></div>
+    <div style="background:#FAF8F3; border:1px solid #D8D3C7; border-radius:12px; padding:28px 36px"><p style="font-size:34px; line-height:1.4"><b style="font-weight:600">With the gray box:</b> each tap waited as long as the work took &mdash; 709 to 1202 ms &mdash; and landed on the new rows.</p></div>
+    <div style="background:#FAF8F3; border:1px solid #D8D3C7; border-radius:12px; padding:28px 36px"><p style="font-size:34px; line-height:1.4"><b style="font-weight:600">The same test, one key apart:</b> 3 passes in 20 without it, 20 in 20 with it.</p></div>
+    <div style="background:#FAF8F3; border:1px solid #D8D3C7; border-radius:12px; padding:28px 36px"><p style="font-size:34px; line-height:1.4"><b style="font-weight:600">The edges held:</b> never-ending work refused at 10 s on all four, naming it.</p></div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Back from the videos. Read the four lines quickly. 3 in 20: the flaky suite passed 0, 0, 3 and 0 times across the emulator, simulator, Pixel and iPhone; the steady suite passed 5 every time. All four devices' numbers are in evidence/README.md in the demo repository, generated from each run.</aside>
+</section></div>
+<div class="slide" data-id="habits"><section id="habits" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:32px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Five habits to take home</h2>
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <div style="background:#1C242D; border-radius:12px; padding:24px 32px; display:flex; gap:28px; align-items:center"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#E0A526; width:48px">1</p><p style="font-size:32px; line-height:1.35">Declare work at both ends, and call it done only once it is on screen.</p></div>
+    <div style="background:#1C242D; border-radius:12px; padding:24px 32px; display:flex; gap:28px; align-items:center"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#E0A526; width:48px">2</p><p style="font-size:32px; line-height:1.35">Keep the hook silent unless a test turned it on.</p></div>
+    <div style="background:#1C242D; border-radius:12px; padding:24px 32px; display:flex; gap:28px; align-items:center"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#E0A526; width:48px">3</p><p style="font-size:32px; line-height:1.35">Treat busy as a lease, so a dead app never holds a test hostage.</p></div>
+    <div style="background:#1C242D; border-radius:12px; padding:24px 32px; display:flex; gap:28px; align-items:center"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#E0A526; width:48px">4</p><p style="font-size:32px; line-height:1.35">Make the black box fail first, in the same run, before trusting the fix.</p></div>
+    <div style="background:#1C242D; border-radius:12px; padding:24px 32px; display:flex; gap:28px; align-items:center"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#E0A526; width:48px">5</p><p style="font-size:32px; line-height:1.35">Record a race with something that adds no time to each step.</p></div>
+  </div>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Each habit is a slide of the talk in one line: the two calls, the silent-by-default library, the lease, the control, and the recorder. None of them needs Mobium in particular; they are what any gray-box hook should do.</aside>
+</section></div>
+<div class="slide" data-id="close"><section id="close" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">Ask &nbsp;·&nbsp; wait &nbsp;·&nbsp; prove</p>
+  <h2 style="font-size:64px; font-weight:600; line-height:1.15; letter-spacing:-1px; width:1640px">Don't guess when the app is done. Ask it, wait for its word, and make the test say what it waited for.</h2>
+  <p style="font-size:40px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1600px">The screen stays the default, and needs nothing from the app. For the work a screen hides, <b style="font-weight:600; color:#E0A526">two calls in the app and one key in the test turn a flaky tap into a steady one.</b></p>
+  <div style="width:1560px; height:1px; background:#2A343E"></div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <p style="font-size:30px; font-weight:300; line-height:1.45; color:#94A0AB; width:1560px">The tool, and the app the demo ran against:</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#EDEAE3">github.com/mobiumdev/mobium &nbsp;·&nbsp; github.com/mobiumdev/mobium-app</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; font-family:'Fira Code', 'Courier New', monospace; font-size:24px; color:#EDEAE3">Lana Begunova &nbsp;·&nbsp; mobiumdev.github.io/guides/graybox</p>
+  <img src="deck/media/mobium-mark.png" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Read the conclusion close to verbatim, then stop. Both repos are public and MIT licensed; the guide in the footer walks the same steps with a tutorial. Q&amp;A material: what counts as work is the app's call; native and Flutter apps write the same lines; calling into the app, not just waiting on it, is measured but not built.</aside>
+</section></div>
+</div>
+<div id="bar"><i></i></div>
+<div id="hud"></div>
+<div id="help">&larr; &rarr; move &nbsp;·&nbsp; S notes &nbsp;·&nbsp; F full screen</div>
+<div id="notes"></div>
+<script>
+(function () {
+  var NOTES = ["Do not introduce yourself yet. Go straight to the two outputs on the next slide. The introduction comes after the cold open, in one line. The tile on the right is Mobium's logo turning into a butterfly and back; let it loop.", "Let both outcomes sit before you speak. The row decides, not the tool: Row B says which generation it belonged to and whether that was the latest, read back with mobium text. Both from the iPhone 15 Plus run of scripts/demo.sh, acts 1 and 2 (evidence/2026-10-05-iphone/transcript.md). Same steps both times: Refresh quietly, then tap Row B. Do not explain the gray box yet; that is the whole talk.", "Black box is the right default and stays the default: it needs nothing from the app. Gray box is for the work a screen hides, and it needs the app to take part. This is the thesis; everything after is how, and how we know.", "Section divider. Two seconds on screen. Do not read it aloud.", "MobiumApp is Mobium's own app under test: every screen is a control for a failure, and the app says what happened rather than leaving the tool to infer it. The work's length is random on purpose: that is what makes a race flaky instead of reliably broken. The screenshot is the iPhone after a stale tap: the outcome line reads row B, generation 1: stale.", "These are Mobium's actionability checks, the ones every action makes before it touches anything (docs/guides/autowait.md). A spinner would fail visible on the rows, and Mobium would wait it out: that is the control in the demo, Refresh with a spinner, current every time. The quiet refresh leaves nothing on screen to wait for.", "Each number is the black-box row of docs/checks/graybox.sh on that device, the last run before this deck: ten taps right after a quiet refresh, launched the ordinary way, each graded by the app. Over fifty more on the iPhone earlier in the day, 35 of 50 were stale. The rate depends on how fast the tool is against how long the work takes, which is exactly why a timeout tuned on one machine fails on another.", "Section divider. Two seconds on screen. Do not read it aloud.", "Simplified from MobiumApp's Busy Demo (App.tsx): the real code counts pending work and calls idle in an effect that runs after the commit. GrayBox is Mobium's gray-box library, a local Expo module in MobiumApp, modules/graybox: about ninety lines of Swift and seventy of Kotlin. A native app writes the same lines itself.", "The whole contract is these lines: an os_log subsystem, dev.mobium.graybox, on iOS, at the notice level with values public; logcat, tag MobiumGrayBox, on Android. iOS keeps a launch argument for that launch only; a launch from the home screen carries no intent extra. So the build you test is the build you could hand anyone, and nothing in it talks unless the test asked.", "1 to 4 ms: on the iPhone 15 Plus, from the app writing a line to Mobium reading it over syslog_relay, with the phone's clock read through lockdown before and after the run to take out the offset (it was 37 to 38 ms ahead of the Mac). Android reads logcat from the device's own time at launch, so a line from an earlier launch is never read, and a restart picks up from the last line's time, so nothing in a gap is lost.", "app_launch with gray_box: true over MCP; launch(app, { grayBox: true }) in JavaScript; LaunchWithGrayBox in Go and .NET; launchWithGrayBox in Java. In a mobium test file, \"grayBox\": true beside \"app\" makes the launch before every test turn it on. An app without the library launches normally and the result says it did not answer, so nothing is waited for by mistake.", "Section divider. Two seconds on screen. Do not read it aloud.", "The wait runs before the target is resolved, not just before the touch, so the target is found on the screen the work produced. The grace is ten times the worst gap measured: in 200 trials on the iPhone the app's busy line came 0 to 15 ms after the lift. With no lift heard during an action, as when the button is in an alert's own window, the grace counts from the action's end instead.", "The renewal runs on a native timer, not on the JavaScript thread, so an app that is busy in JavaScript still renews, and a dead or suspended process stops. The output is verbatim from the Pixel 7 emulator run's transcript: Crash during a refresh holds a busy lease named doomed and dies 300 ms in; the next tap, on the status bar, is not held up. On Android the app often says away on its way down, and then that is the reason given: the same answer, sooner.", "Each row is a row of docs/checks/graybox-edges.sh in Mobium, driven by a button on MobiumApp's Busy Demo: Refresh from an alert, Refresh twice, Keep polling, Crash during a refresh. The last three leave the app, so they run on the emulator and the simulator only: on a phone, the screen outside the app is somebody's. All four devices pass every row they run.", "Every line here is verbatim from a run: the 955 ms wait and the polling refusal from the iPhone; the background and logcat lines from the emulator's edge checks. In JSON the waits are in app_idle. The refusal is a timeout that failed check idle, the sixth check after the five auto-wait makes, and its remedy, launching again without the gray box, is one that works.", "Section divider. Two seconds on screen. Do not read it aloud.", "docs/checks/graybox.sh in Mobium, the last run on each device. Three columns because three questions: does the race happen (normal), does auto-wait already handle what it can see (the spinner, the control: never stale), and does the gray box close the gap. Each row is graded by the app's own outcome line, never by what the tool reported.", "Two taps, Refresh quietly then Row B, timed on the Pixel 8 Pro: 1.59 and 1.35 s untraced, 5.12 and 5.42 s with a full trace, 1.35 and 1.30 s with trace --no-screenshots --no-maps. The bars are drawn to that scale, at 200 px a second. The first Pixel run, with full traces, landed current five times in five. Mobium's trace help now says so. The general lesson: any instrument that adds time to each step can make a race disappear.", "Statement divider. The recordings are what scripts/demo.sh captured on each device on 5 October 2026; if a live run is possible, run act 1 and act 2 on the emulator and show the recordings for the rest.", "The script and every run's evidence are in the demo repository; evidence/README.md is generated from each run's summary, so no number in it is typed by hand. A run ends by taking this machine's paths out of its evidence. On a real phone everything recorded is the app's own screen; the crash, which leaves the app, runs only on a virtual device.", "Acts 1 and 2 of scripts/demo.sh on the Pixel 7 emulator, Android 15 (evidence/2026-10-05-android-emulator). Left: launched normally, Row B tapped while generation 1 was still up. Right: launched with the gray box; the tap waited 1148 ms for the app to say it was done, and landed on generation 2. Act 3: flaky.test.json 0 passed, 5 failed; steady.test.json 5 passed.", "Acts 1 and 2 on the iPhone 17 Pro simulator, iOS 26.5 (evidence/2026-10-05-ios-simulator). The tap waited 1202 ms. On a simulator Mobium hears the app through a log stream narrowed to the library's subsystem. Act 3: flaky 0 passed, 5 failed; steady 5 passed.", "Acts 1 and 2 on a real Pixel 8 Pro, Android 17 (evidence/2026-10-05-android-phone). Everything recorded is the app's own screen. The tap waited 709 ms. The flaky suite passed 3 of 5 here, the honest middle of the range; the steady one passed 5 of 5. This is the device where a full trace hid the race; these recordings are from the rerun with screen-free traces.", "Acts 1 and 2 on a real iPhone 15 Plus, iOS 26.6.2 (evidence/2026-10-05-iphone), the same run as the cold open. The recording is WebDriverAgent's screen stream, about ten frames a second at full size. The tap waited 955 ms. Act 3: flaky 0 passed, 5 failed; steady 5 passed. Act 4: the never-ending work was refused after 10.0 s, naming poll.", "Back from the videos. Read the four lines quickly. 3 in 20: the flaky suite passed 0, 0, 3 and 0 times across the emulator, simulator, Pixel and iPhone; the steady suite passed 5 every time. All four devices' numbers are in evidence/README.md in the demo repository, generated from each run.", "Each habit is a slide of the talk in one line: the two calls, the silent-by-default library, the lease, the control, and the recorder. None of them needs Mobium in particular; they are what any gray-box hook should do.", "Read the conclusion close to verbatim, then stop. Both repos are public and MIT licensed; the guide in the footer walks the same steps with a tutorial. Q&amp;A material: what counts as work is the app's call; native and Flutter apps write the same lines; calling into the app, not just waiting on it, is measured but not built."];
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var hud = document.getElementById('hud');
+  var bar = document.querySelector('#bar > i');
+  var notesEl = document.getElementById('notes');
+  var i = 0, showNotes = false;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    slides.forEach(function (el) {
+      el.firstElementChild.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+    });
+  }
+  function render() {
+    slides.forEach(function (el, n) { el.classList.toggle('is-active', n === i); });
+    hud.textContent = (i + 1) + ' / ' + 29;
+    bar.style.width = ((i + 1) / 29 * 100) + '%';
+    notesEl.innerHTML = '';
+    if (NOTES[i]) {
+      var b = document.createElement('b'); b.textContent = 'Speaker notes';
+      var p = document.createElement('div'); p.textContent = NOTES[i];
+      notesEl.appendChild(b); notesEl.appendChild(p);
+    }
+    notesEl.classList.toggle('on', showNotes && !!NOTES[i]);
+    if (location.hash.slice(1) !== String(i + 1)) {
+      history.replaceState(null, '', '#' + (i + 1));
+    }
+  }
+  function go(n) { i = Math.max(0, Math.min(29 - 1, n)); render(); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { go(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { go(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(29 - 1); }
+    else if (e.key === 's' || e.key === 'S') { showNotes = !showNotes; render(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else { document.documentElement.requestFullscreen(); }
+    }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#notes') || e.target.closest('a')) { return; }
+    go(e.clientX < window.innerWidth * 0.25 ? i - 1 : i + 1);
+  });
+  window.addEventListener('resize', fit);
+
+  var start = parseInt(location.hash.slice(1), 10);
+  if (start > 0 && start <= 29) { i = start - 1; }
+  fit(); render();
+})();
+</script>
+</body>
+</html>

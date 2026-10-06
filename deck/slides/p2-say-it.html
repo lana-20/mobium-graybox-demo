@@ -1,0 +1,16 @@
+<section id="p2-say-it" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Two calls in the app: busy, and idle once it shows</h2>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:36px 48px; display:flex; flex-direction:column; gap:6px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">const refresh = () =&gt; {</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;GrayBox.<b style="color:#E0A526">busy</b>('quiet');</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">&nbsp;&nbsp;// ... the work; when it is done, the new rows ...</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">};</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#94A0AB">&nbsp;</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">useEffect(() =&gt; {</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">&nbsp;&nbsp;GrayBox.<b style="color:#E0A526">idle</b>('quiet'); &nbsp;<span style="color:#94A0AB">// after the new rows render</span></p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">}, [generation]);</p>
+  </div>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">Idle means <b style="font-weight:600; color:#EDEAE3">done and on screen</b>, not "the response arrived". Only the app can say that, so the app decides what counts as work.</p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Simplified from MobiumApp's Busy Demo (App.tsx): the real code counts pending work and calls idle in an effect that runs after the commit. GrayBox is Mobium's gray-box library, a local Expo module in MobiumApp, modules/graybox: about ninety lines of Swift and seventy of Kotlin. A native app writes the same lines itself.</aside>
+</section>

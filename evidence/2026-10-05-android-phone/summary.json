@@ -1,0 +1,21 @@
+{
+  "device": "android-phone",
+  "act1": {
+    "row_b": "row B, generation 1: stale",
+    "attempts": 1
+  },
+  "act2": {
+    "row_b": "row B, generation 2: current",
+    "tap": "waited 709 ms for the app to go idle (busy: quiet)"
+  },
+  "act3": {
+    "flaky": "3 passed, 2 failed (38.7s)",
+    "steady": "5 passed (2m17.8s)"
+  },
+  "act4": {
+    "poll_refused_after_ms": 10088,
+    "poll": "error: testid=busyRowA failed check idle: the app says it is still busy after 10s, with poll \u2014 something in the app never finishes; to act on the screen as it is, launch the app again without gray_box",
+    "crash": ""
+  },
+  "video": true
+}

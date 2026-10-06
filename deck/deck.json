@@ -1,0 +1,81 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-05T21:30:00Z"
+  },
+  "lists": "css",
+  "title": "Ask the App: Gray-Box Mobile Testing with Mobium",
+  "order": [
+    "cover",
+    "open-numbers",
+    "premise",
+    "part1",
+    "p1-busy-demo",
+    "p1-four-checks",
+    "p1-flaky",
+    "part2",
+    "p2-say-it",
+    "p2-lines",
+    "p2-reach",
+    "p2-one-key",
+    "part3",
+    "p3-wait",
+    "p3-lease",
+    "p3-edges",
+    "p3-honest",
+    "part4",
+    "p4-control",
+    "p4-watching",
+    "demo",
+    "demo-run",
+    "demo-emulator",
+    "demo-simulator",
+    "demo-pixel",
+    "demo-iphone",
+    "demo-results",
+    "habits",
+    "close"
+  ],
+  "sections": {
+    "s0": {
+      "description": "The same tap, stale and current, and why only the app knows when it is done",
+      "start": "cover"
+    },
+    "s1": {
+      "description": "Part 1: the race nobody can see, on MobiumApp's Busy Demo",
+      "start": "part1"
+    },
+    "s2": {
+      "description": "Part 2: the app says when it is busy, and Mobium listens on channels it already holds",
+      "start": "part2"
+    },
+    "s3": {
+      "description": "Part 3: a door that closes, with busy as a lease and every result saying what it waited for",
+      "start": "part3"
+    },
+    "s4": {
+      "description": "Part 4: proving it, with black box failing first and a recorder that changed the timing",
+      "start": "part4"
+    },
+    "s5": {
+      "description": "Demo: four devices, two real phones, a simulator and an emulator",
+      "start": "demo"
+    },
+    "s6": {
+      "description": "How to use it, and the close",
+      "start": "habits"
+    }
+  },
+  "faces": {
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+    },
+    "fira-code": {
+      "family": "Fira Code",
+      "href": "https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

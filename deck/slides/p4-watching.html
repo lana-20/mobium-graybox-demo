@@ -1,0 +1,12 @@
+<section id="p4-watching" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Watching changed the timing</h2>
+  <p style="font-size:34px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">The first Pixel recording showed no race at all. A full trace screenshots and reads the screen after every call, and every call waits for it.</p>
+  <div style="display:flex; flex-direction:column; gap:22px; width:1400px">
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">no trace</p><div style="width:281px; height:44px; background:#4C8C6A; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">1.4 s</p></div>
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">full trace</p><div style="width:1024px; height:44px; background:#C4452F; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">5.1 s</p></div>
+    <div style="display:flex; align-items:center; gap:28px"><p style="font-size:30px; width:360px">trace, no screens</p><div style="width:261px; height:44px; background:#4C8C6A; border-radius:6px"></div><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:32px; color:#EDEAE3">1.3 s</p></div>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">With the work lasting at most 1.6 s, five seconds per two taps let it finish first, every time. <b style="font-weight:600; color:#EDEAE3">The demo records the screen as video and traces calls without screens.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Two taps, Refresh quietly then Row B, timed on the Pixel 8 Pro: 1.59 and 1.35 s untraced, 5.12 and 5.42 s with a full trace, 1.35 and 1.30 s with trace --no-screenshots --no-maps. The bars are drawn to that scale, at 200 px a second. The first Pixel run, with full traces, landed current five times in five. Mobium's trace help now says so. The general lesson: any instrument that adds time to each step can make a race disappear.</aside>
+</section>

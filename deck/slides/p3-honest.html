@@ -1,0 +1,15 @@
+<section id="p3-honest" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Every result says what it waited for</h2>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:32px 44px; display:flex; flex-direction:column; gap:10px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#E0A526">gray box: waited 955 ms for the app to go idle (busy: quiet)</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#EDEAE3">gray box: the app was idle</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#BDC6CE">gray box: not waited — the app said it is in the background</p>
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#BDC6CE">gray box: not waited — not hearing the app: logcat stopped</p>
+  </div>
+  <div style="background:#0E1318; border:1px solid #2A343E; border-radius:14px; padding:32px 44px; display:flex; flex-direction:column; gap:10px">
+    <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:28px; color:#C4452F">error: testid=busyRowA failed check idle: the app says it is still busy after 10s, with poll — something in the app never finishes; to act on the screen as it is, launch the app again without gray_box</p>
+  </div>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#BDC6CE; width:1560px">A check a result does not mention reads as one that ran. <b style="font-weight:600; color:#EDEAE3">So none is silent, and every refusal names a remedy that works.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Every line here is verbatim from a run: the 955 ms wait and the polling refusal from the iPhone; the background and logcat lines from the emulator's edge checks. In JSON the waits are in app_idle. The refusal is a timeout that failed check idle, the sixth check after the five auto-wait makes, and its remedy, launching again without the gray box, is one that works.</aside>
+</section>

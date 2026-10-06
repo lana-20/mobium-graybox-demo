@@ -1,0 +1,19 @@
+{
+  "description": "A tap right after work the screen does not show, launched the ordinary way: Mobium waits for what it can see, and Row B is on screen, still, enabled and uncovered the whole time the work runs.",
+  "app": "dev.mobium.mobiumapp",
+  "beforeEach": [
+    {"scroll_to": {"target": "label=Busy Demo", "direction": "down"}},
+    {"tap": "label=Busy Demo"}
+  ],
+  "tests": [
+    {
+      "name": "a row tapped after a quiet refresh is current (${run})",
+      "each": [{"run": 1}, {"run": 2}, {"run": 3}, {"run": 4}, {"run": 5}],
+      "steps": [
+        {"tap": "testid=busyQuiet"},
+        {"tap": "testid=busyRowB"},
+        {"wait_for": {"target": "testid=busyOutcome", "condition": "text", "text": ": current", "timeout_ms": 3000}}
+      ]
+    }
+  ]
+}

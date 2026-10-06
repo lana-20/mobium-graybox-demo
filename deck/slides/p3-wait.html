@@ -1,0 +1,14 @@
+<section id="p3-wait" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Before every touch, three things in order</h2>
+  <div style="display:flex; gap:24px; align-items:stretch">
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">1 &nbsp;the lift</p><p style="font-size:30px; line-height:1.35">the last tap's finger-up has been heard</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">2 &nbsp;150 ms of grace</p><p style="font-size:30px; line-height:1.35">for work that tap starts to be announced</p></div>
+    <div style="flex:1; background:#FAF8F3; border:1px solid #D8D3C7; border-radius:14px; padding:32px; display:flex; flex-direction:column; gap:10px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#9A6A10">3 &nbsp;busy=0</p><p style="font-size:30px; line-height:1.35">nothing in flight, then find the target</p></div>
+  </div>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:30px 36px; display:flex; flex-direction:column; gap:6px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:56px; font-weight:600; color:#E0A526">0–15 ms</p><p style="font-size:28px; color:#BDC6CE">from the lift to the app's busy line, 200 trials</p></div>
+    <div style="flex:1; background:#141A21; border-radius:14px; padding:30px 36px; display:flex; flex-direction:column; gap:6px"><p style="font-family:'Fira Code', 'Courier New', monospace; font-size:56px; font-weight:600; color:#E0A526">~35 ms</p><p style="font-size:28px; color:#BDC6CE">what a wait costs when the app is idle</p></div>
+  </div>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>The wait runs before the target is resolved, not just before the touch, so the target is found on the screen the work produced. The grace is ten times the worst gap measured: in 200 trials on the iPhone the app's busy line came 0 to 15 ms after the lift. With no lift heard during an action, as when the button is in an alert's own window, the grace counts from the action's end instead.</aside>
+</section>

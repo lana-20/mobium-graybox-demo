@@ -1,0 +1,13 @@
+<section id="p4-control" data-transition="fade" style="background:#F0EDE6; color:#141A21; font-family:Rubik, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <h2 style="font-size:60px; font-weight:600; line-height:1.14; letter-spacing:-1px">Black box has to fail first, in the same run</h2>
+  <table style="width:1664px; font-family:'Fira Code', 'Courier New', monospace; font-size:30px; color:#141A21; border:1px solid #D8D3C7; border-radius:8px; padding:14px">
+    <tr style="background:#E6E1D6"><th style="width:40%; text-align:left; font-size:24px; color:#5A6169">device</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">normal: stale</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">spinner: stale</th><th style="width:20%; text-align:left; font-size:24px; color:#5A6169">gray box: stale</th></tr>
+    <tr><td>Pixel 7 emulator</td><td style="color:#C4452F">10 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr style="background:#F6F3EC"><td>iPhone 17 Pro simulator</td><td style="color:#C4452F">9 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr><td>Pixel 8 Pro</td><td style="color:#C4452F">7 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+    <tr style="background:#F6F3EC"><td>iPhone 15 Plus</td><td style="color:#C4452F">9 of 10</td><td>0 of 3</td><td style="color:#4C8C6A">0 of 10</td></tr>
+  </table>
+  <p style="font-size:32px; font-weight:300; line-height:1.4; color:#5A6169; width:1600px">The check fails if the normal launch never taps a stale row. <b style="font-weight:600; color:#141A21">A zero is not a result until the same setup has shown it can come back non-zero.</b></p>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>docs/checks/graybox.sh in Mobium, the last run on each device. Three columns because three questions: does the race happen (normal), does auto-wait already handle what it can see (the spinner, the control: never stale), and does the gray box close the gap. Each row is graded by the app's own outcome line, never by what the tool reported.</aside>
+</section>

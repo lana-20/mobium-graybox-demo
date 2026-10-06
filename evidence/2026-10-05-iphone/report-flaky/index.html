@@ -1,0 +1,61 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Mobium test report</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--muted:#6e6e73;--line:#e5e5ea;--ok:#1a7f37;--bad:#c62828;--warn:#9a6700;--code:#f5f5f7}
+@media (prefers-color-scheme:dark){:root{--bg:#161617;--fg:#f5f5f7;--muted:#a1a1a6;--line:#2c2c2e;--ok:#3fb950;--bad:#f85149;--warn:#d29922;--code:#1f1f21}}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto}h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted)}
+.counts span{margin-right:16px;font-weight:600}.passed{color:var(--ok)}.failed{color:var(--bad)}.flaky{color:var(--warn)}
+details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:10px;padding:0 8px}
+pre{background:var(--code);padding:10px;overflow:auto;font-size:12px;border-radius:6px;white-space:pre-wrap}
+img{max-width:320px;width:100%;border:1px solid var(--line);border-radius:8px}
+.film{display:flex;gap:10px;overflow-x:auto;padding:4px 0 10px}
+.frame{flex:0 0 150px;font-size:12px}.frame img{width:150px}.frame.bad{color:var(--bad)}
+.frame details{border:0;padding:0}.frame pre{max-width:320px}
+</style></head><body><main><h1>Mobium test report</h1><p class="muted">2026-10-05 20:25:19 · 50.8s</p><p class="counts"><span class="passed">0 passed</span><span class="flaky">0 flaky</span><span class="failed">5 failed</span></p><p class="muted">A failure keeps a screenshot of the device. On a real phone that is a picture of somebody's screen; run with --no-screenshots to keep none.</p><details open><summary><strong class="failed">failed</strong><span>flaky.test.json › a row tapped after a quiet refresh is current (1)</span><span class="tag">iphone</span><span class="muted">10.2s</span></summary><p>Failed</p><pre>step 3 (app_wait_for): [timeout] step 3 of 3 (app_wait_for) failed: timed out after 3.239s waiting for testid=busyOutcome to contain &#34;: current&#34; — its text is &#34;row B, generation 1: stale&#34;; steps 1-2 ran before it, and nothing after</pre><p><img src="artifacts/iphone-flaky.test.json-a-row-tapped-after-a-quiet-refresh-is-current-1--1.png" alt="The screen when it failed"></p><p class="muted">The map when it failed</p><pre>@e1 Back (button)
+@e2 Refresh (button)
+@e3 Refresh quietly (button)
+@e4 Refresh from an alert (button)
+@e5 Refresh twice (button)
+@e6 Keep polling (button)
+@e7 Crash during a refresh (button)
+@e8 Row A · generation 2 (button)
+@e9 Row B · generation 2 (button)
+@e10 Row C · generation 2 (button)</pre></details><details open><summary><strong class="failed">failed</strong><span>flaky.test.json › a row tapped after a quiet refresh is current (2)</span><span class="tag">iphone</span><span class="muted">10.2s</span></summary><p>Failed</p><pre>step 3 (app_wait_for): [timeout] step 3 of 3 (app_wait_for) failed: timed out after 3.22s waiting for testid=busyOutcome to contain &#34;: current&#34; — its text is &#34;row B, generation 1: stale&#34;; steps 1-2 ran before it, and nothing after</pre><p><img src="artifacts/iphone-flaky.test.json-a-row-tapped-after-a-quiet-refresh-is-current-2--1.png" alt="The screen when it failed"></p><p class="muted">The map when it failed</p><pre>@e1 Back (button)
+@e2 Refresh (button)
+@e3 Refresh quietly (button)
+@e4 Refresh from an alert (button)
+@e5 Refresh twice (button)
+@e6 Keep polling (button)
+@e7 Crash during a refresh (button)
+@e8 Row A · generation 2 (button)
+@e9 Row B · generation 2 (button)
+@e10 Row C · generation 2 (button)</pre></details><details open><summary><strong class="failed">failed</strong><span>flaky.test.json › a row tapped after a quiet refresh is current (3)</span><span class="tag">iphone</span><span class="muted">10.1s</span></summary><p>Failed</p><pre>step 3 (app_wait_for): [timeout] step 3 of 3 (app_wait_for) failed: timed out after 3.266s waiting for testid=busyOutcome to contain &#34;: current&#34; — its text is &#34;row B, generation 1: stale&#34;; steps 1-2 ran before it, and nothing after</pre><p><img src="artifacts/iphone-flaky.test.json-a-row-tapped-after-a-quiet-refresh-is-current-3--1.png" alt="The screen when it failed"></p><p class="muted">The map when it failed</p><pre>@e1 Back (button)
+@e2 Refresh (button)
+@e3 Refresh quietly (button)
+@e4 Refresh from an alert (button)
+@e5 Refresh twice (button)
+@e6 Keep polling (button)
+@e7 Crash during a refresh (button)
+@e8 Row A · generation 2 (button)
+@e9 Row B · generation 2 (button)
+@e10 Row C · generation 2 (button)</pre></details><details open><summary><strong class="failed">failed</strong><span>flaky.test.json › a row tapped after a quiet refresh is current (4)</span><span class="tag">iphone</span><span class="muted">9.9s</span></summary><p>Failed</p><pre>step 3 (app_wait_for): [timeout] step 3 of 3 (app_wait_for) failed: timed out after 3.24s waiting for testid=busyOutcome to contain &#34;: current&#34; — its text is &#34;row B, generation 1: stale&#34;; steps 1-2 ran before it, and nothing after</pre><p><img src="artifacts/iphone-flaky.test.json-a-row-tapped-after-a-quiet-refresh-is-current-4--1.png" alt="The screen when it failed"></p><p class="muted">The map when it failed</p><pre>@e1 Back (button)
+@e2 Refresh (button)
+@e3 Refresh quietly (button)
+@e4 Refresh from an alert (button)
+@e5 Refresh twice (button)
+@e6 Keep polling (button)
+@e7 Crash during a refresh (button)
+@e8 Row A · generation 2 (button)
+@e9 Row B · generation 2 (button)
+@e10 Row C · generation 2 (button)</pre></details><details open><summary><strong class="failed">failed</strong><span>flaky.test.json › a row tapped after a quiet refresh is current (5)</span><span class="tag">iphone</span><span class="muted">10.4s</span></summary><p>Failed</p><pre>step 3 (app_wait_for): [timeout] step 3 of 3 (app_wait_for) failed: timed out after 3.258s waiting for testid=busyOutcome to contain &#34;: current&#34; — its text is &#34;row B, generation 1: stale&#34;; steps 1-2 ran before it, and nothing after</pre><p><img src="artifacts/iphone-flaky.test.json-a-row-tapped-after-a-quiet-refresh-is-current-5--1.png" alt="The screen when it failed"></p><p class="muted">The map when it failed</p><pre>@e1 Back (button)
+@e2 Refresh (button)
+@e3 Refresh quietly (button)
+@e4 Refresh from an alert (button)
+@e5 Refresh twice (button)
+@e6 Keep polling (button)
+@e7 Crash during a refresh (button)
+@e8 Row A · generation 2 (button)
+@e9 Row B · generation 2 (button)
+@e10 Row C · generation 2 (button)</pre></details></main></body></html>
