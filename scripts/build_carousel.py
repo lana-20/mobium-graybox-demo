@@ -155,11 +155,11 @@ def slide(n, eyebrow, body, extra=""):
 
 
 def foot(mark, right="mobium &middot; gray box"):
-    return f"""    <div class="foot"><img class="mark" src="{mark}" alt="Mobium"><span class="sig">{right}</span></div>"""
+    return f"""    <div class="foot"><span></span><span class="sig">{right}</span></div>"""
 
 
 def slides():
-    mark = data_uri("mark.png")
+    mark = None  # footers carry a caption only; the logo is on slides 1 and 10
     stale, current = data_uri("stale.jpg"), data_uri("current.jpg")
     pixel, iphone = data_uri("pixel-toast.jpg"), data_uri("iphone-toast.jpg")
     out = []
@@ -282,7 +282,7 @@ device.<span class="k">hook</span>(<span class="s">"raiseToast"</span>, <span cl
     <div class="links">
       <a class="link" href="https://github.com/mobiumdev/mobium"><em>Mobium</em>github.com/mobiumdev/mobium</a>
       <a class="link" href="https://github.com/lana-20/mobium-graybox-demo"><em>Quick start, tutorial, evidence</em>github.com/lana-20/mobium-graybox-demo</a>
-      <a class="link" href="https://lana-20.github.io/mobium-graybox-demo/"><em>The talk, with every device's recordings</em>lana-20.github.io/mobium-graybox-demo</a>
+      <a class="link" href="https://lana-20.github.io/mobium-graybox-demo/"><em>The demo, with every device's recordings</em>lana-20.github.io/mobium-graybox-demo</a>
     </div>
 {foot(mark, "Lana Begunova<br>mobile automation for AI agents and humans")}""", "cta"))
     return "\n".join(out)
