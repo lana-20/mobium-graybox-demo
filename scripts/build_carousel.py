@@ -95,7 +95,10 @@ pre .stop { color: var(--stop); font-weight: 500; }
 
 /* 1: cover */
 .cover h1 .late { color: var(--brass); }
-.logo { width: 34cqw; height: auto; display: block; margin-left: -3cqw; }
+/* The logo: the glossy mark over the wordmark, left-aligned with the text. */
+.logo { display: flex; flex-direction: column; align-items: center; gap: 1.4cqw; width: 24cqw; }
+.logo .glyph { width: 100%; height: auto; display: block; }
+.logo .word { width: 82%; height: auto; display: block; }
 .cover .rows { display: grid; gap: 1.6cqw; margin-top: 2cqw; }
 .cover .row { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 3.2cqw; padding: 2.4cqw 3cqw; border-radius: 1.4cqw; background: var(--well); border: 1px solid var(--rule); }
 .cover .row em { font-style: normal; font-size: 2.3cqw; color: var(--dim); }
@@ -164,8 +167,10 @@ def slides():
     pixel, iphone = data_uri("pixel-toast.jpg"), data_uri("iphone-toast.jpg")
     out = []
 
-    logo = data_uri("logo-dark.png")
-    out.append(slide(1, "Mobium &middot; gray box", f"""    <img class="logo" src="{logo}" alt="Mobium">
+    glyph, word = data_uri("mark3d.png"), data_uri("wordmark.png")
+    logo_html = lambda width: (f'<div class="logo" style="width:{width}cqw" role="img" aria-label="Mobium">'
+                               f'<img class="glyph" src="{glyph}" alt=""><img class="word" src="{word}" alt=""></div>')
+    out.append(slide(1, "Mobium &middot; gray box", f"""    {logo_html(24)}
     <h1>The tap was right.<br><span class="late">It landed too early.</span></h1>
     <p>Why a test that does everything right still flakes on mobile, and how Mobium asks the app when it is done. Measured on an emulator, a simulator, a Pixel 8 Pro and an iPhone 15 Plus.</p>
     <div class="rows">
@@ -275,7 +280,7 @@ device.<span class="k">hook</span>(<span class="s">"raiseToast"</span>, <span cl
     </div>
 {foot(mark)}"""))
 
-    out.append(slide(10, "Try it", f"""    <img class="logo" src="{logo}" alt="Mobium" style="width:22cqw">
+    out.append(slide(10, "Try it", f"""    {logo_html(16)}
     <h2>See the race, then fix it, in a few minutes.</h2>
 <pre><span class="p">$</span> go install github.com/mobiumdev/mobium/cmd/mobium@latest
 <span class="p">$</span> mobium launch --gray-box dev.mobium.mobiumapp</pre>
