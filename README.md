@@ -10,6 +10,7 @@ virtual and real.
 | **[The deck](https://lana-20.github.io/mobium-graybox-demo/)** | *Ask the App*, the talk: 30 slides with each device's recordings (arrow keys move, S shows the speaker notes) |
 | **[Quick start](docs/QUICKSTART.md)** | install Mobium, put MobiumApp on an emulator, and watch the same tap land stale, then current |
 | **[Tutorial](docs/TUTORIAL.md)** | the race as a test that fails five in five and passes five in five with one key, from Python, at its edges, hooks that call into the app, and in your own app |
+| **[Carousel](https://lana-20.github.io/mobium-graybox-demo/carousel/)** | ten slides for LinkedIn, the gray box start to finish; [as a PDF](carousel/mobium-gray-box.pdf), 1080 × 1350 a page, built by `scripts/build_carousel.py` |
 | **[Evidence](evidence/README.md)** | every run behind the deck: four devices, with recordings, traces, reports and transcripts |
 
 Every command and output in the quick start and the tutorial was run from
