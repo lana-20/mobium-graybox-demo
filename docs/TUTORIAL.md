@@ -1,8 +1,9 @@
 # Tutorial: from a flaky test to a steady one
 
 The [quick start](QUICKSTART.md) showed one tap. This tutorial makes it a
-test, runs it from Python, pushes the gray box to its edges, and ends with
-what your own app needs to write.
+test, runs it from Python, pushes the gray box to its edges, turns it round
+so the test asks the app to do something, and ends with what your own app
+needs to write.
 
 Every command and output below was run on 5 October 2026 from a fresh clone
 of this repository, with Mobium installed by `go install` and MobiumApp built
@@ -16,8 +17,9 @@ steps 1 to 3 — Mobium installed, MobiumApp on a running emulator.
 - [3. From Python](#3-from-python)
 - [4. What the result says](#4-what-the-result-says)
 - [5. Work that never ends](#5-work-that-never-ends)
-- [6. Your own app](#6-your-own-app)
-- [7. Proving it on your devices](#7-proving-it-on-your-devices)
+- [6. Ask the app to do something](#6-ask-the-app-to-do-something)
+- [7. Your own app](#7-your-own-app)
+- [8. Proving it on your devices](#8-proving-it-on-your-devices)
 
 ## 1. The test that flakes
 
@@ -212,7 +214,99 @@ After 10 seconds the action is refused with exit status 6, a timeout, naming
 what the app said kept it busy. The remedy it names works: launched without
 the gray box, the app is driven by what is on screen.
 
-## 6. Your own app
+## 6. Ask the app to do something
+
+Waiting is the app talking to the test. Hooks are the other direction: the
+app registers a function by name, and a test calls it and gets back what it
+returned — sign in, seed data, raise a toast, without walking the UI to get
+there.
+
+MobiumApp registers three: `raiseToast`, `screen` and `signIn`. In its
+simplest form, `raiseToast` is this:
+
+```js
+// the app, in a build made for testing
+GrayBox.register("raiseToast", (message) => {
+  ToastAndroid.show(message, ToastAndroid.SHORT);
+  return "shown";
+});
+```
+
+MobiumApp's own also draws a toast of its own at the top of the screen
+(`testID="hookToast"`), which is what an iPhone shows and what a test can
+read back. From the command line:
+
+```sh
+mobium launch --gray-box dev.mobium.mobiumapp
+mobium hook screen
+mobium hook raiseToast "Toast raised by test script"
+mobium text testid=hookToast
+mobium hook signIn mobium
+mobium text testid=welcomeText
+mobium hook raiseTost typo
+```
+
+```
+$ mobium hook screen
+hook screen answered: "home"
+gray box: the app was idle
+
+$ mobium hook raiseToast "Toast raised by test script"
+hook raiseToast answered: "shown"
+gray box: the app was idle
+
+$ mobium text testid=hookToast
+Toast raised by test script
+
+$ mobium hook signIn mobium
+hook signIn answered: "signed in as mobium"
+gray box: the app was idle
+
+$ mobium text testid=welcomeText
+Welcome, mobium!
+
+$ mobium hook raiseTost typo
+error: the app has no hook named raiseTost; registered: raiseToast, screen, signIn
+```
+
+`signIn` put the app on its welcome screen without the login form ever
+being shown. The misspelled call was refused with exit status 2, an invalid
+argument, naming the hooks that exist. A hook called on an app launched
+without `--gray-box` is refused too, naming the launch that fixes it.
+
+From Python, it is [`examples/hook_toast.py`](../examples/hook_toast.py):
+
+```python
+device.launch(APP, gray_box=True)
+
+print("hook returned:", repr(device.hook("raiseToast", "Toast raised by test script")))
+print("app's toast:  ", repr(device.text("testid=hookToast")))
+
+try:
+    device.hook("raiseTost", "typo")
+except InvalidArgumentError as e:
+    print("typo:", type(e).__name__, "-", e)
+```
+
+```
+$ MOBIUM_DEVICE=emulator-5554 python3 examples/hook_toast.py
+hook returned: 'shown'
+app's toast:   'Toast raised by test script'
+typo: InvalidArgumentError - the app has no hook named raiseTost; registered: raiseToast, screen, signIn
+```
+
+A hook's arguments are strings, and what it returns comes back as JSON: a
+string, a number, an object. While a hook runs, and until two frames after
+it answers, the app counts as busy, so the next action lands on the screen
+the hook produced. And a message no keyboard layout holds whole — 
+`"Привет, café — 5 ✓"` — arrives as sent, on every device: the call travels
+ASCII-escaped.
+
+Register hooks only in builds made for testing. A hook in a shipped build
+is a door into the app; the gray box keeps it shut unless the launch opened
+it, but it should not be there at all.
+
+## 7. Your own app
 
 The gray box needs the app to say two things: when work starts, and when it
 is finished **and on screen**. In MobiumApp that is two calls around the
@@ -269,7 +363,22 @@ still renews it and a dead process doesn't. `lift` lets Mobium give work a
 tap starts 150 ms to be announced; MobiumApp's library says it from a touch
 recognizer on the key window (iOS) and the window's callback (Android).
 
-## 7. Proving it on your devices
+**Hooks** need two things more. A text field whose accessibility identifier
+(iOS) or content description (Android) is `mobium-mailbox`, added only in a
+gray-box launch, small and kept on top: Mobium writes each call into it as
+one line of JSON, `{"i":"<id>","h":"<name>","a":["<arg>", ...]}`, with
+everything outside ASCII escaped. The app clears the field, runs the hook,
+and answers on the same log:
+
+```
+MOBIUM-GRAYBOX hook id=<id> ok "shown"
+MOBIUM-GRAYBOX hook id=<id> error <what went wrong>
+```
+
+The answer after `ok` is JSON. An error that begins `no hook named` is
+reported as an unknown hook; any other is the hook failing, with its text.
+
+## 8. Proving it on your devices
 
 A fix has nothing to prove until the problem has shown up in the same run.
 [`scripts/demo.sh`](../scripts/demo.sh) runs all of this on one device —
@@ -278,10 +387,16 @@ recording, a trace, screenshots, the reports and a transcript of each:
 
 ```sh
 MOBIUM=$(go env GOPATH)/bin/mobium scripts/demo.sh emulator-5554
+MOBIUM=$(go env GOPATH)/bin/mobium scripts/hooks.sh emulator-5554
 python3 scripts/summarize.py
 ```
 
+[`scripts/hooks.sh`](../scripts/hooks.sh) is section 6 as a recorded act:
+the toasts, the sign-in and the refused typo, with a screen recording, a
+trace, screenshots and a transcript.
+
 [`evidence/`](../evidence/README.md) holds the runs behind the deck: a Pixel 7
 emulator, an iPhone 17 Pro simulator, a real Pixel 8 Pro and a real iPhone
-15 Plus. Mobium's own checks, `docs/checks/graybox.sh` and
-`graybox-edges.sh`, hold the same demo to the app's verdict on every device.
+15 Plus. Mobium's own checks, `docs/checks/graybox.sh`, `graybox-edges.sh`
+and `graybox-hooks.sh`, hold the same demo to the app's verdict on every
+device.

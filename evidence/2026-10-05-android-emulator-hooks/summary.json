@@ -1,0 +1,15 @@
+{
+  "device": "android-emulator",
+  "act5": {
+    "screen": "hook screen answered: \"home\"\ngray box: the app was idle",
+    "raise_toast": "hook raiseToast answered: \"shown\"\ngray box: the app was idle",
+    "raise_toast_ms": 55,
+    "toast_shown": "Toast raised by test script",
+    "toast_unicode": "Привет, café — 5 ✓",
+    "sign_in": "hook signIn answered: \"signed in as mobium\"\ngray box: the app was idle",
+    "welcome": "Welcome, mobium!",
+    "screen_after": "hook screen answered: \"secret\"\ngray box: waited 35 ms for the app to go idle",
+    "typo": "error: the app has no hook named raiseTost; registered: raiseToast, screen, signIn"
+  },
+  "video": true
+}

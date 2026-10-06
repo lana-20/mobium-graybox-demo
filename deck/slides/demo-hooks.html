@@ -1,0 +1,32 @@
+<section id="demo-hooks" data-transition="fade" style="background:#141A21; color:#EDEAE3; font-family:Rubik, Arial, sans-serif; padding:112px 128px 96px; display:flex; flex-direction:column; justify-content:center; gap:0px">
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:26px; min-width:0">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#E0A526; letter-spacing:2px; text-transform:uppercase">Act 5 · hooks</p>
+      <h2 style="font-size:64px; font-weight:600; line-height:1.1; letter-spacing:-1px">Ask the app to do something</h2>
+      <pre style="margin:0; font-family:'Fira Code', 'Courier New', monospace; font-size:23px; line-height:1.45; color:#BDC6CE; background:#0E1318; border:1px solid #2A343E; border-radius:12px; padding:22px 26px; white-space:pre"><span style="color:#6E7A86">// the app, in a build made for testing</span>
+GrayBox.<span style="color:#E0A526">register</span>(<span style="color:#9AD3B1">"raiseToast"</span>, (message) =&gt; {
+  ToastAndroid.show(message, ToastAndroid.SHORT);
+  <span style="color:#E0A526">return</span> <span style="color:#9AD3B1">"shown"</span>;
+});
+
+<span style="color:#6E7A86"># the test</span>
+device.<span style="color:#E0A526">launch</span>(<span style="color:#9AD3B1">"dev.mobium.mobiumapp"</span>, gray_box=True)
+device.<span style="color:#E0A526">hook</span>(<span style="color:#9AD3B1">"raiseToast"</span>, <span style="color:#9AD3B1">"Toast raised by test script"</span>)
+<span style="color:#4C8C6A">'shown'</span></pre>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#BDC6CE">signIn mobium &nbsp;→ <b style="color:#4C8C6A">Welcome, mobium!</b></p>
+        <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#BDC6CE">raiseTost &nbsp;&nbsp;&nbsp;&nbsp;→ <b style="color:#C4452F">no hook named raiseTost</b></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">Pixel 8 Pro</p>
+      <img src="/_blob/8962207a76361c185afc568fd46058da" data-video="/_blob/97a14b0fb55ed9c70244489091aea437" alt="Real Pixel 8 Pro: a test raises a toast in MobiumApp through a hook, then a toast in Russian, then signs in without the form" style="width:322px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px">
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; align-items:center">
+      <p style="font-family:'Fira Code', 'Courier New', monospace; font-size:26px; color:#4C8C6A; letter-spacing:2px; text-transform:uppercase">iPhone 15 Plus</p>
+      <img src="/_blob/759313001b1a97aaa6523ced117bba90" data-video="/_blob/33412830e8e79d787e46a03cea36599c" alt="Real iPhone 15 Plus: a test raises a toast in MobiumApp through a hook, then a toast in Russian, then signs in without the form" style="width:330px; height:716px; object-fit:contain; background:#0E1318; border:1px solid #2A343E; border-radius:18px">
+    </div>
+  </div>
+  <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
+  <aside>Act 5, scripts/hooks.sh, on a real Pixel 8 Pro (evidence/2026-10-05-android-phone-hooks) and a real iPhone 15 Plus (evidence/2026-10-06-iphone-hooks). The app registers a function by name with its gray-box library; the test calls it and gets back what it returned. MobiumApp's raiseToast also draws its own toast at the top, which is what the iPhone shows; on the Pixel, Android's system toast is below it. Then a message no keyboard layout holds whole, Привет, café — 5 ✓, arrives as sent; signIn reaches the welcome screen without the form; a misspelled hook is refused, naming the three that exist. The call reaches the app through a hidden field that exists only in a gray-box launch: typed by WebDriverAgent on iOS, 2.2 s for this call on the iPhone; set by UiAutomator2 on Android, 0.4 s on the Pixel. The answer comes back on the device log the gray box already reads. Only registered names, only in a gray-box launch, and only in builds made for testing.</aside>
+</section>

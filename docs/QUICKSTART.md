@@ -16,6 +16,7 @@ MobiumApp cloned and built fresh. The iOS simulator works the same way;
 - [3. Put MobiumApp on the emulator](#3-put-mobiumapp-on-the-emulator)
 - [4. Watch the tap land too early](#4-watch-the-tap-land-too-early)
 - [5. Ask the app](#5-ask-the-app)
+- [6. Ask the app to do something](#6-ask-the-app-to-do-something)
 - [On an iOS simulator](#on-an-ios-simulator)
 - [Next](#next)
 
@@ -162,6 +163,47 @@ what it waited for.
 (on iOS, the launch argument `-MobiumGrayBox YES`). MobiumApp's library is
 silent without it, so the same build behaves normally for anyone who opens it
 from the home screen.
+
+## 6. Ask the app to do something
+
+The gray box works the other way too. MobiumApp registers functions by name
+— `raiseToast`, `screen`, `signIn` — and a test calls them with
+`mobium hook`:
+
+```sh
+mobium launch --gray-box dev.mobium.mobiumapp
+mobium hook raiseToast "Toast raised by test script"
+mobium text testid=hookToast
+mobium hook signIn mobium
+mobium text testid=welcomeText
+```
+
+```
+$ mobium launch --gray-box dev.mobium.mobiumapp
+launched dev.mobium.mobiumapp, with the gray box: every action waits for the app to say it is idle
+
+$ mobium hook raiseToast "Toast raised by test script"
+hook raiseToast answered: "shown"
+gray box: waited 140 ms for the app to go idle
+
+$ mobium text testid=hookToast
+Toast raised by test script
+
+$ mobium hook signIn mobium
+hook signIn answered: "signed in as mobium"
+gray box: waited 42 ms for the app to go idle
+
+$ mobium text testid=welcomeText
+Welcome, mobium!
+```
+
+The toast appears at the top of the screen, and on Android a system toast
+too; `signIn` lands on the welcome screen without the login form. Run on 6
+October 2026 with `mobium@latest` at
+`v0.0.0-20261006064802-1e87bc331781`, the first version with hooks, and
+MobiumApp from `main`. [The tutorial](TUTORIAL.md#6-ask-the-app-to-do-something)
+has the rest: from Python, a refused typo, and what an app writes to offer
+hooks of its own.
 
 ## On an iOS simulator
 

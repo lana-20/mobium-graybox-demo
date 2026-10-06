@@ -1,23 +1,23 @@
 # Ask the app
 
-A tap that lands too early, made steady by asking the app when it is done —
-with [Mobium](https://github.com/mobiumdev/mobium)'s gray box, on
+A tap that lands too early, made steady by asking the app when it is done;
+then the app asked to do something itself — with [Mobium](https://github.com/mobiumdev/mobium)'s gray box, on
 [MobiumApp](https://github.com/mobiumdev/mobium-app), on Android and iOS,
 virtual and real.
 
 | | |
 | --- | --- |
-| **[The deck](https://lana-20.github.io/mobium-graybox-demo/)** | *Ask the App*, the talk: 29 slides with each device's recordings (arrow keys move, S shows the speaker notes) |
+| **[The deck](https://lana-20.github.io/mobium-graybox-demo/)** | *Ask the App*, the talk: 30 slides with each device's recordings (arrow keys move, S shows the speaker notes) |
 | **[Quick start](docs/QUICKSTART.md)** | install Mobium, put MobiumApp on an emulator, and watch the same tap land stale, then current |
-| **[Tutorial](docs/TUTORIAL.md)** | the race as a test that fails five in five and passes five in five with one key, from Python, at its edges, and in your own app |
+| **[Tutorial](docs/TUTORIAL.md)** | the race as a test that fails five in five and passes five in five with one key, from Python, at its edges, hooks that call into the app, and in your own app |
 | **[Evidence](evidence/README.md)** | every run behind the deck: four devices, with recordings, traces, reports and transcripts |
 
 Every command and output in the quick start and the tutorial was run from
 scratch — Mobium installed with `go install`, MobiumApp and this repository
 freshly cloned — and is shown as it printed.
 
-Everything here runs. `scripts/demo.sh` drives one device through four acts
-and keeps the evidence of each: a screen recording, a trace, screenshots of
+Everything here runs. `scripts/demo.sh` drives one device through four acts,
+and `scripts/hooks.sh` through the fifth; each keeps the evidence of each: a screen recording, a trace, screenshots of
 what the app said, the test reports, and a transcript of every command with
 what it printed. [`evidence/`](evidence/README.md) holds the runs, and its
 table is generated from them.
@@ -41,7 +41,7 @@ target is on screen, still, enabled and not covered — and Row B is all four
 of those the whole time the work runs. The screen cannot say the work is
 not done. Only the app can.
 
-## The four acts
+## The five acts
 
 | Act | What happens | What it shows |
 | --- | --- | --- |
@@ -49,6 +49,7 @@ not done. Only the app can.
 | 2. Ask the app | the same two taps, launched with `--gray-box` | the second tap waits for the app — `gray box: waited 1148 ms for the app to go idle (busy: quiet)`, on the emulator — and Row B is current |
 | 3. As a test | [`tests/flaky.test.json`](tests/flaky.test.json) and [`tests/steady.test.json`](tests/steady.test.json), five times each | the same test, one key apart: five failures, then five passes |
 | 4. The edges | work that never ends; the app crashing mid-work | refused after 10 s, naming the work; a dead app holds nothing up |
+| 5. Ask the app to do something | `mobium hook raiseToast "Toast raised by test script"`, then `signIn`, then a typo | the app's toast says what was sent; the welcome screen without the form; the typo refused, naming the hooks that exist |
 
 The timing above is from the emulator run; [`evidence/README.md`](evidence/README.md)
 has every run's.
@@ -115,6 +116,7 @@ export MOBIUM=$PWD/mobium/bin/mobium
 
 scripts/demo.sh emulator-5554                          # an Android emulator
 scripts/demo.sh 457C7DC2-C706-45D9-8D68-1D26953E28B1   # an iOS simulator
+scripts/hooks.sh emulator-5554                         # act 5, the hooks
 python3 scripts/summarize.py                           # rebuild evidence/README.md
 ```
 
@@ -136,7 +138,7 @@ stream, about ten frames a second at full size.
 
 ## The deck
 
-`index.html` is the talk's slide deck, 29 slides: open it in a browser
+`index.html` is the talk's slide deck, 30 slides: open it in a browser
 (arrow keys move, S shows the speaker notes, F goes full screen). It is
 built from `deck/deck.json` and one file per slide in `deck/slides/`, with
 the recordings and posters in `deck/media/`:
@@ -145,8 +147,34 @@ the recordings and posters in `deck/media/`:
 python3 scripts/build_deck.py     # -> index.html, which GitHub Pages can serve as is
 ```
 
-The demo slides loop act 1 against act 2 for each device, from the runs in
-`evidence/`.
+The demo slides loop act 1 against act 2 for each device, and act 5's hooks
+on both phones, from the runs in `evidence/`.
+
+## Hooks: the test asks the app
+
+Waiting is the app telling the test it is busy. Hooks go the other way: the
+app registers a function by name, and a test calls it.
+
+```js
+// the app, in a build made for testing
+GrayBox.register("raiseToast", (message) => {
+  ToastAndroid.show(message, ToastAndroid.SHORT);
+  return "shown";
+});
+```
+
+```python
+# the test
+device.launch("dev.mobium.mobiumapp", gray_box=True)
+device.hook("raiseToast", "Toast raised by test script")  # 'shown'
+```
+
+MobiumApp's `raiseToast` also draws its own toast at the top of the screen,
+which is what an iPhone shows and what the test reads back. The call arrives
+only in a gray-box launch, only a registered name can be called, and a hook's
+work counts as busy, so the next action waits for what it changed.
+[`examples/hook_toast.py`](examples/hook_toast.py) runs it;
+[the tutorial](docs/TUTORIAL.md#6-ask-the-app-to-do-something) walks through it.
 
 ## What the gray box does not do
 
