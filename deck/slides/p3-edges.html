@@ -5,10 +5,10 @@
     <tr><td>work that never ends</td><td>refused after 10 s, naming it</td><td>all four</td></tr>
     <tr style="background:#F6F3EC"><td>refresh from an alert</td><td>grace from the action's end; current</td><td>all four</td></tr>
     <tr><td>two refreshes at once</td><td>both waited out</td><td>all four</td></tr>
-    <tr style="background:#F6F3EC"><td>Home, mid-work</td><td>not waited on: in the background</td><td>virtual devices</td></tr>
-    <tr><td>a crash, mid-work</td><td>not waited on: the lease ran out</td><td>virtual devices</td></tr>
-    <tr style="background:#F6F3EC"><td>the log stream killed</td><td>says so, then hears again</td><td>virtual devices</td></tr>
+    <tr style="background:#F6F3EC"><td>Home, mid-work</td><td>not waited on: in the background</td><td>all four</td></tr>
+    <tr><td>a crash, mid-work</td><td>not waited on: lease out, or said away</td><td>all four</td></tr>
+    <tr style="background:#F6F3EC"><td>the log stream killed</td><td>says so, then hears again</td><td>all but the iPhone</td></tr>
   </table>
   <img src="/_blob/c05270e8146d1e26cdbb290f94697423" alt="Mobium" style="position:absolute; right:48px; top:40px; width:63px; height:64px; object-fit:contain">
-  <aside>Each row is a row of docs/checks/graybox-edges.sh in Mobium, driven by a button on MobiumApp's Busy Demo: Refresh from an alert, Refresh twice, Keep polling, Crash during a refresh. The last three leave the app, so they run on the emulator and the simulator only: on a phone, the screen outside the app is somebody's. All four devices pass every row they run.</aside>
+  <aside>Each row is a row of docs/checks/graybox-edges.sh in Mobium, driven by a button on MobiumApp's Busy Demo: Refresh from an alert, Refresh twice, Keep polling, Crash during a refresh. Home and the crash leave the app, so on a phone they run only when the owner says so (ALLOW_PHONE=1): they change no setting and record nothing outside MobiumApp, and they passed on the Pixel 8 Pro and the iPhone 15 Plus. The killed stream needs a stream to kill from outside: on Android it is adb logcat on the Mac, the Pixel included, and on a simulator a log stream; on a real iPhone it is a connection inside Mobium's daemon, with nothing outside to stop. All four devices pass every row they run.</aside>
 </section>
